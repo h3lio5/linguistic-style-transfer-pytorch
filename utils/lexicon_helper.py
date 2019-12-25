@@ -2,8 +2,6 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction import stop_words
 from spacy.lang.en.stop_words import STOP_WORDS as spacy_stopwords
 
-from linguistic_style_transfer_model.config import global_config
-
 
 def get_sentiment_words():
     with open(file='../data/lexicon/positive-words.txt',
