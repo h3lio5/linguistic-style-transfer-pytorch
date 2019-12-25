@@ -1,9 +1,6 @@
 import torch
 from torch.utils.data import Dataset
 import numpy as np
-from nltk.corpus import stopwords
-from sklearn.feature_extraction import stop_words
-from spacy.lang.en.stop_words import STOP_WORDS as spacy_stopwords
 
 
 class TextDataset(Dataset):
