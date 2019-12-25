@@ -42,16 +42,14 @@ class Vocab:
                 words.update(line.split())
         # Store only 9200 most common words
         words = words.most_common(self.vocab_size)
-        print("words", len(words))
         logging.info("collected {} most common words".format(self.vocab_size))
         # Create word2index, index2word by iterating over
         # the most common words
         for token in words:
-
             word2index[token[0]] = i
             i = i + 1
             index2word[i] = token[0]
-        print(len(word2index))
+
         logging.info("Created word2index dictionary")
         logging.info("Created index2word dictionary")
         # Saving the vocab file
@@ -72,6 +70,7 @@ class Vocab:
         """
         blacklisted_words = set()
         bow_filtered_vocab_indices = dict()
+        # The '|' operator on sets in python acts as a union operator
         blacklisted_words |= set(self.predefined_word_index.values())
         if self.filter_sentiment_words:
             blacklisted_words |= self._get_sentiment_words()
@@ -80,6 +79,7 @@ class Vocab:
 
         allowed_vocab = word_index.keys() - blacklisted_words
         i = 0
+
         for word in allowed_vocab:
             vocab_index = word_index[word]
             bow_filtered_vocab_indices[vocab_index] = i
@@ -99,9 +99,9 @@ class Vocab:
         Returns all the sentiment words (positive and negative)
         which are excluded from the main vocab to form the BoW vocab
         """
-        with open(file='../data/lexicon/positive-words.txt',
+        with open(file=config.pos_sentiment_file_path,
                   mode='r', encoding='ISO-8859-1') as pos_sentiment_words_file,\
-            open(file='../data/lexicon/negative-words.txt',
+            open(file=config.neg_sentiment_file_path,
                  mode='r', encoding='ISO-8859-1') as neg_sentiment_words_file:
             pos_words = pos_sentiment_words_file.readlines()
             neg_words = neg_sentiment_words_file.readlines()
@@ -119,7 +119,7 @@ class Vocab:
         sklearn_stopwords = stop_words.ENGLISH_STOP_WORDS
 
         all_stopwords = set()
-        # The '|' operator on python sets acts as a union operator
+        # The '|' operator on sets in python acts as a union operator
         all_stopwords |= spacy_stopwords
         all_stopwords |= nltk_stopwords
         all_stopwords |= sklearn_stopwords
