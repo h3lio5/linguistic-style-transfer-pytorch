@@ -1,5 +1,8 @@
 
 class Config:
+    """
+    """
+
     def __init__(self):
         self.vocab_size = 9200
         self.vocab_save_path = '../data/'
@@ -10,6 +13,8 @@ class Config:
         self.train_labels_file_path = "../data/clean/yelp_train_labels.txt"
         self.pos_sentiment_file_path = "../data/lexicon/positive-words.txt"
         self.neg_sentiment_file_path = "../data/lexicon/negative-words.txt"
+        self.word_embedding_file_path = "../data/embedding.txt"
+        self.embedding_size = 300
         self.unk_token = "<unk>"
         self.sos_token = "<sos>"
         self.eos_token = "<eos>"
@@ -20,3 +25,17 @@ class Config:
         }
         self.filter_sentiment_words = True
         self.filter_stopwords = True
+
+
+class ModelConfig:
+    """
+    """
+
+    def __init__(self):
+        self.embedding_size = 300
+        self.max_seq_len = 15
+        self.hidden_dim = 256
+        self.style_hidden_dim = 8
+        self.content_hidden_dim = 128
+        self.num_style = 2
+        self.content_bow_dim = 7526
