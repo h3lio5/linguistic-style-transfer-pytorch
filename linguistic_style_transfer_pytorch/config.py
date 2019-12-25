@@ -15,7 +15,6 @@ class Config:
         self.neg_sentiment_file_path = "../data/lexicon/negative-words.txt"
         self.word_embedding_file_path = "../data/embedding.txt"
         self.embedding_size = 300
-        self.sos_token = "<sos>"
         self.eos_token = "<eos>"
         self.predefined_word_index = {
             "<unk>": 0,
