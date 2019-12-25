@@ -21,7 +21,7 @@ class Config:
         self.predefined_word_index = {
             "<unk>": 0,
             "<sos>": 1,
-            self.eos_token: 2,
+            "<eos>": 2,
         }
         self.filter_sentiment_words = True
         self.filter_stopwords = True
