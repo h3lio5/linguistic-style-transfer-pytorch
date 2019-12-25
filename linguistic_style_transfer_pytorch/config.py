@@ -20,7 +20,7 @@ class Config:
         self.eos_token = "<eos>"
         self.predefined_word_index = {
             "<unk>": 0,
-            self.sos_token: 1,
+            "<sos>": 1,
             self.eos_token: 2,
         }
         self.filter_sentiment_words = True
