@@ -19,7 +19,7 @@ class Config:
         self.sos_token = "<sos>"
         self.eos_token = "<eos>"
         self.predefined_word_index = {
-            self.unk_token: 0,
+            "<unk>": 0,
             self.sos_token: 1,
             self.eos_token: 2,
         }
