@@ -36,3 +36,4 @@ class ModelConfig:
         self.content_hidden_dim = 128
         self.num_style = 2
         self.content_bow_dim = 7526
+        self.emb_dropout = 0.8
