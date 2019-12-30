@@ -1,6 +1,7 @@
 
-class Config:
+class GeneralConfig:
     """
+    General configuration
     """
 
     def __init__(self):
@@ -26,6 +27,7 @@ class Config:
 
 class ModelConfig:
     """
+    Model configuration
     """
 
     def __init__(self):
