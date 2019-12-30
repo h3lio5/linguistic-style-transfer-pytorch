@@ -178,13 +178,24 @@ class AutoEncoder(nn.Module):
             content_emb_mu, content_emb_sigma)
         sampled_style_emb = self.sample_prior(style_emb_mu, style_emb_sigma)
 
-        #### Losses on content space ###
+        ### Losses on content space ###
         # Discriminator Loss
         content_disc_preds = self.get_content_disc_preds(sampled_style_emb)
         content_disc_loss = self.get_content_disc_loss(
             content_disc_preds, content_bow)
         # adversarial entropy
-        content_entropy_loss = self.get_entropy(content_disc_preds)
+        content_entropy_loss = self.get_entropy_loss(content_disc_preds)
         # Multitask loss
         content_mul_loss = self.get_content_mul_loss(
             sampled_content_emb, content_bow)
+
+        ### Losses on style space ###
+        # Discriminator loss
+        style_disc_preds = self.get_style_disc_preds(sampled_content_emb)
+        style_disc_loss = self.get_style_disc_loss(
+            style_disc_preds, style_labels)
+        # adversarial entropy
+        style_entropy_loss = self.get_entropy_loss(style_disc_preds)
+        # Multitask loss
+        style_mul_loss = self.get_style_mul_loss(
+            sampled_style_emb, style_labels)
