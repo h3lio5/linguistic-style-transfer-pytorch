@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from linguistic_style_transfer_pytorch.config import ModelConfig, GeneralConfig
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from torch.nn.utils.rnn import pack_padded_sequence
 
 
 mconfig = ModelConfig()
