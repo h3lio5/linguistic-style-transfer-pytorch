@@ -5,7 +5,7 @@ import logging
 import collections
 import numpy as np
 import json
-from linguistic_style_transfer_pytorch.config import Config
+from linguistic_style_transfer_pytorch.config import GeneralConfig
 
 # Part of Code taken from https://github.com/vineetjohn/linguistic-style-transfer/tree/master/linguistic_style_transfer_model/utils
 
@@ -128,6 +128,6 @@ class Vocab:
 
 
 if __name__ == "__main__":
-    config = Config()
+    config = GeneralConfig()
     vocab = Vocab(config)
     vocab.create_vocab()
