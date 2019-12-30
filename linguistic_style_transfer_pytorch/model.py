@@ -129,9 +129,9 @@ class AutoEncoder(nn.Module):
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        content_mul_loss = nn.BCELoss(preds, smoothed_style_labels)
+        style_mul_loss = nn.BCELoss(preds, smoothed_style_labels)
 
-        return content_mul_loss
+        return style_mul_loss
 
     def forward(self, sequences, seq_lengths, style_labels, content_bow):
         """
