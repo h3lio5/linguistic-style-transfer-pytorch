@@ -57,7 +57,7 @@ class AutoEncoder(nn.Module):
 
     def get_content_disc_preds(self, style_emb):
         """
-        Returns the predictions about the content using style embedding
+        Returns predictions about the content using style embedding
         as input
         output shape : [batch_size,content_bow_dim]
         """
@@ -86,26 +86,42 @@ class AutoEncoder(nn.Module):
 
         return content_disc_loss
 
-    def get_style_disc_loss(self, content_emb, style_labels):
+    def get_style_disc_preds(self, content_emb):
         """
-        It essentially quantifies the amount of information about style  
-        contained in the content space
-        Returns:
-        cross entropy loss of style discriminator
+        Returns predictions about style using content embeddings 
+        as input
+        output shape: [batch_size,num_style]
         """
         # predictions
         # Note: detach the content embedding since when don't want the gradient to flow
         #       all the way to the encoder. style_disc_loss is used only to change the
         #       parameters of the discriminator network
         preds = nn.Softmax(self.style_disc(self.dropout(content_emb.detach())))
+
+        return preds
+
+    def get_style_disc_loss(self, style_disc_preds, style_labels):
+        """
+        It essentially quantifies the amount of information about style  
+        contained in the content space
+        Returns:
+        cross entropy loss of style discriminator
+        """
         # label smoothing
         smoothed_style_labels = style_labels * \
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        style_disc_loss = nn.BCELoss(preds, smoothed_style_labels)
+        style_disc_loss = nn.BCELoss(style_disc_preds, smoothed_style_labels)
 
         return style_disc_loss
+
+    def get_entropy_loss(self, preds):
+        """
+        Returns the entropy loss: negative of the entropy present in the
+        input distribution
+        """
+        return torch.mean(torch.sum(preds * torch.log(preds), dim=1))
 
     def get_content_mul_loss(self, content_emb, content_bow):
         """
