@@ -123,13 +123,13 @@ class AutoEncoder(nn.Module):
         cross entropy loss of the content classifier
         """
         # predictions
-        preds = nn.Softmax(self.content_classifier(self.dropout(content_emb)))
+        preds = nn.Softmax(self.content_classifier(self.dropout(style_emb)))
         # label smoothing
-        smoothed_content_bow = content_bow * \
+        smoothed_style_labels = style_labels * \
             (1-mconfig.label_smoothing) + \
-            mconfig.label_smoothing/mconfig.content_bow_dim
+            mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        content_mul_loss = nn.BCELoss(preds, smoothed_content_bow)
+        content_mul_loss = nn.BCELoss(preds, smoothed_style_labels)
 
         return content_mul_loss
 
