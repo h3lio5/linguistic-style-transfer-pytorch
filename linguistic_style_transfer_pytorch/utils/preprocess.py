@@ -1,8 +1,8 @@
 import re
 import logging
-from linguistic_style_transfer_pytorch.config import Config
+from linguistic_style_transfer_pytorch.config import GeneralConfig
 
-config = Config()
+config = GeneralConfig()
 
 
 def clean_text(string):
