@@ -117,10 +117,10 @@ class AutoEncoder(nn.Module):
 
     def get_style_mul_loss(self, style_emb, style_labels):
         """
-        This loss quantifies the amount of content information preserved 
-        in the content space
+        This loss quantifies the amount of style information preserved 
+        in the style space
         Returns:
-        cross entropy loss of the content classifier
+        cross entropy loss of the style classifier
         """
         # predictions
         preds = nn.Softmax(self.content_classifier(self.dropout(style_emb)))
