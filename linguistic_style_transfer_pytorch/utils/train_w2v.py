@@ -1,7 +1,7 @@
 from gensim.models import Word2Vec
 from gensim.models.word2vec import LineSentence
 import logging
-from linguistic_style_transfer_pytorch.config import Config
+from linguistic_style_transfer_pytorch.config import GeneralConfig
 
 
 def train_word2vec_model(text_file_path, model_file_path):
@@ -18,6 +18,6 @@ def train_word2vec_model(text_file_path, model_file_path):
 
 
 if __name__ == "__main__":
-    config = Config()
+    config = GeneralConfig()
     train_word2vec_model(config.train_file_path,
                          config.word_embedding_file_path)
