@@ -55,24 +55,34 @@ class AutoEncoder(nn.Module):
         epsilon = torch.randn(mu.size(1))
         return mu + epsilon*torch.exp(log_sigma)
 
-    def get_content_disc_loss(self, style_emb, content_bow):
+    def get_content_disc_preds(self, style_emb):
         """
-        It essentially quantifies the amount of information about content  
-        contained in the style space
-        Returns:
-        cross entropy loss of content discriminator
+        Returns the predictions about the content using style embedding
+        as input
+        output shape : [batch_size,content_bow_dim]
         """
         # predictions
         # Note: detach the style embedding since when don't want the gradient to flow
         #       all the way to the encoder. content_disc_loss is used only to change the
         #       parameters of the discriminator network
         preds = nn.Softmax(self.content_disc(self.dropout(style_emb.detach())))
+
+        return preds
+
+    def get_content_disc_loss(self, content_disc_preds, content_bow):
+        """
+        It essentially quantifies the amount of information about content  
+        contained in the style space
+        Returns:
+        cross entropy loss of content discriminator
+        """
         # label smoothing
         smoothed_content_bow = content_bow * \
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.content_bow_dim
         # calculate cross entropy loss
-        content_disc_loss = nn.BCELoss(preds, smoothed_content_bow)
+        content_disc_loss = nn.BCELoss(
+            content_disc_preds, smoothed_content_bow)
 
         return content_disc_loss
 
@@ -154,8 +164,11 @@ class AutoEncoder(nn.Module):
 
         #### Losses on content space ###
         # Discriminator Loss
+        content_disc_preds = self.get_content_disc_preds(sampled_style_emb)
         content_disc_loss = self.get_content_disc_loss(
-            sampled_style_emb, content_bow)
+            content_disc_preds, content_bow)
+        # adversarial entropy
+        content_entropy_loss = self.get_entropy(content_disc_preds)
         # Multitask loss
         content_mul_loss = self.get_content_mul_loss(
             sampled_content_emb, content_bow)
