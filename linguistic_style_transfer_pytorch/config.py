@@ -37,3 +37,4 @@ class ModelConfig:
         self.num_style = 2
         self.content_bow_dim = 7526
         self.emb_dropout = 0.8
+        self.label_smoothing = 0.1
