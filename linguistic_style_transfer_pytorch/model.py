@@ -45,7 +45,7 @@ class AutoEncoder(nn.Module):
         self.decoder = nn.GRUCell(
             mconfig.embedding_size + mconfig.content_hidden_dim + mconfig.style_hidden_dim, mconfig.hidden_dim)
         # dropout
-        self.dropout = mconfig.emb_dropout
+        self.dropout = nn.Dropout(mconfig.emb_dropout)
 
     def sample_prior(self, mu, log_sigma):
         """
@@ -72,7 +72,7 @@ class AutoEncoder(nn.Module):
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.content_bow_dim
         # calculate cross entropy loss
-        content_disc_loss = nn.BCELoss(preds, smoothed_content_bow.detach())
+        content_disc_loss = nn.BCELoss(preds, smoothed_content_bow)
 
         return content_disc_loss
 
@@ -93,7 +93,7 @@ class AutoEncoder(nn.Module):
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        style_disc_loss = nn.BCELoss(preds, smoothed_style_labels.detach())
+        style_disc_loss = nn.BCELoss(preds, smoothed_style_labels)
 
         return style_disc_loss
 
@@ -106,6 +106,32 @@ class AutoEncoder(nn.Module):
         """
         # predictions
         preds = nn.Softmax(self.content_classifier(self.dropout(content_emb)))
+        # label smoothing
+        smoothed_content_bow = content_bow * \
+            (1-mconfig.label_smoothing) + \
+            mconfig.label_smoothing/mconfig.content_bow_dim
+        # calculate cross entropy loss
+        content_mul_loss = nn.BCELoss(preds, smoothed_content_bow)
+
+        return content_mul_loss
+
+    def get_style_mul_loss(self, style_emb, style_labels):
+        """
+        This loss quantifies the amount of content information preserved 
+        in the content space
+        Returns:
+        cross entropy loss of the content classifier
+        """
+        # predictions
+        preds = nn.Softmax(self.content_classifier(self.dropout(content_emb)))
+        # label smoothing
+        smoothed_content_bow = content_bow * \
+            (1-mconfig.label_smoothing) + \
+            mconfig.label_smoothing/mconfig.content_bow_dim
+        # calculate cross entropy loss
+        content_mul_loss = nn.BCELoss(preds, smoothed_content_bow)
+
+        return content_mul_loss
 
     def forward(self, sequences, seq_lengths, style_labels, content_bow):
         """
