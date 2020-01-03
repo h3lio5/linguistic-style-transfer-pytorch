@@ -7,7 +7,6 @@ class GeneralConfig:
     def __init__(self):
         self.vocab_size = 9200
         self.vocab_save_path = '../data/'
-        self.train_file_path = '../data/clean/yelp_train_data.txt'
         self.train_pos_reviews_file_path = "../data/raw/yelp_train_pos.txt"
         self.train_neg_reviews_file_path = "../data/raw/yelp_train_neg.txt"
         self.train_text_file_path = "../data/clean/yelp_train_data.txt"
@@ -15,6 +14,7 @@ class GeneralConfig:
         self.pos_sentiment_file_path = "../data/lexicon/positive-words.txt"
         self.neg_sentiment_file_path = "../data/lexicon/negative-words.txt"
         self.word_embedding_file_path = "../data/embedding.txt"
+        self.
         self.embedding_size = 300
         self.predefined_word_index = {
             "<unk>": 0,

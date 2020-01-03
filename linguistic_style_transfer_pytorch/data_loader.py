@@ -1,16 +1,22 @@
 import torch
 from torch.utils.data import Dataset
 import numpy as np
+from linguistic_style_transfer_pytorch.config import GeneralConfig
+
+gconfig = GeneralConfig()
 
 
 class TextDataset(Dataset):
     """
     """
 
-    def __init__(self, batch_size=32, bow_size=):
+    def __init__(self, mode='train'):
         super(self, TextDataset).__init__()
-
-        self.bow_size = bow_size
+        with open(gconfig.train_text_file_path) as f:
+            train_data = f.readlines()
+        with open(gconfig.train_labels_file_path) as f:
+            train_labels = f.readlines()
+        with open(gconfig.word_embedding_file_path) as f:
 
     def _get_bow_representations(self, text_sequences):
         """
