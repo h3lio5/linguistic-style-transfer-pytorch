@@ -64,7 +64,6 @@ class Vocab:
         # the most common words
         for token in words:
             if token[0] in w2v_model:
-                print("I'm in")
                 word2index[token[0]] = idx
                 index2word[idx] = token[0]
                 emb_matrix[idx, :] = w2v_model[token[0]]
