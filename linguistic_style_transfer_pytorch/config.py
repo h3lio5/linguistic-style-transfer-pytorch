@@ -38,6 +38,7 @@ class ModelConfig:
 
     def __init__(self):
         self.vocab_size = 9200
+        self.epochs = 20
         # batch setting
         self.batch_size = 128
         # layer sizes
@@ -53,7 +54,6 @@ class ModelConfig:
         self.dropout = 0.8
         # sequence length settings
         self.max_seq_len = 15
-
         # learning rates
         self.autoencoder_lr = 0.001
         self.style_adversary_lr = 0.001
