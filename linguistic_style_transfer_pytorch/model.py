@@ -43,9 +43,9 @@ class AutoEncoder(nn.Module):
         # Decoder
         # Note: input embeddings are concatenated with the sampled latent vector at every step
         self.decoder = nn.GRUCell(
-            mconfig.embedding_size + mconfig.content_hidden_dim + mconfig.style_hidden_dim, mconfig.hidden_dim)
+            mconfig.embedding_size + mconfig.generative_emb_dim, mconfig.hidden_dim)
         # dropout
-        self.dropout = nn.Dropout(mconfig.emb_dropout)
+        self.dropout = nn.Dropout(mconfig.dropout)
 
     def sample_prior(self, mu, log_sigma):
         """
