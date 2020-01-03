@@ -10,12 +10,17 @@ gconfig = GeneralConfig()
 
 class AdversarialVAE(nn.Module):
     """
+    Model architecture defined according to the paper 
+    'Disentangled Representation Learning for Non-Parallel Text Style Transfer'
+    https://www.aclweb.org/anthology/P19-1041.pdf
+
     """
 
     def __init__(self, inference=False):
         """
         Initialize networks
         """
+        super(AdversarialVAE, self).__init__()
         # Inference mode or training mode
         self.inference = inference
         # word embeddings
@@ -44,7 +49,7 @@ class AdversarialVAE(nn.Module):
         # Note: input embeddings are concatenated with the sampled latent vector at every step
         self.decoder = nn.GRUCell(
             mconfig.embedding_size + mconfig.generative_emb_dim, mconfig.hidden_dim)
-        self.projector = nn.Linear(mconfig.hidden_dim, self.vocab_size)
+        self.projector = nn.Linear(mconfig.hidden_dim, mconfig.vocab_size)
         # dropout
         self.dropout = nn.Dropout(mconfig.dropout)
 
@@ -58,7 +63,10 @@ class AdversarialVAE(nn.Module):
             iteration: number of iterations completed till now; used for KL annealing
 
         Returns:
-
+            content_disc_loss: loss incurred by content discriminator/adversary
+            style_disc_loss  : loss incurred by style discriminator/adversary
+            vae_and_classifier_loss : consists of loss incurred by autoencoder, content and style
+                               classifiers
         """
         embedded_seqs = self.dropout(self.embedding(sequences))
         # pack the sequences to reduce unnecessary computations
@@ -122,13 +130,28 @@ class AdversarialVAE(nn.Module):
         reconstruction_loss = self.get_recon_loss(
             reconstructed_sentences, sequences)
         #================ total weighted loss ==========#
-        autoencoder_loss = mconfig.content_adversary_loss_weight * content_entropy_loss + \
+        vae_and_classifier_loss = mconfig.content_adversary_loss_weight * content_entropy_loss + \
             mconfig.style_adversary_loss_weight * style_entropy_loss + \
             mconfig.style_multitask_loss_weight * style_mul_loss + \
             mconfig.content_multitask_loss_weight * content_mul_loss + \
             reconstruction_loss
 
-        return content_disc_loss, style_disc_loss, autoencoder_loss
+        return content_disc_loss, style_disc_loss, vae_and_classifier_loss
+
+    def get_params(self):
+        """
+        Returns:
+            content_disc_params: parameters of the content discriminator/adversary
+            style_disc_params  : parameters of the style discriminator/adversary
+            other_params       : parameters of the vae and classifiers
+        """
+
+        content_disc_params = self.content_disc.parameters()
+        style_disc_params = self.style_disc.parameters()
+        other_params = [self.encoder.parameters(), self.decoder.parameters(),
+                        self.style_classifier.parameters(), self.content_classifier.parameters()]
+
+        return content_disc_params, style_disc_params, other_params
 
     def sample_prior(self, mu, log_sigma):
         """
@@ -290,17 +313,17 @@ class AdversarialVAE(nn.Module):
             sentence_embs = self.dropout(self.embedding(input_sentences))
             # Make the latent embedding compatible for concatenation
             latent_emb = latent_emb.unsqueeze(1).repeat(
-                1, mconfig.yelp_max_seq_len, 1)
+                1, mconfig.max_seq_len, 1)
             gen_sent_embs = torch.cat(
                 sentence_embs, latent_emb, dim=2)
             # Delete latent embedding and sos token tensor to reduce memory usage
             del latent_emb, sos_token_tensor
             output_sentences = torch.zeros(
-                mconfig.yelp_max_seq_len, mconfig.batch_size, mconfig.vocab_size)
+                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size)
             # initialize hidden state
             hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
             # generate sentences one word at a time in a loop
-            for idx in range(mconfig.yelp_max_seq_len):
+            for idx in range(mconfig.max_seq_len):
                 # get words at the index idx from all the batches
                 words = gen_sent_embs[:, idx, :]
                 hidden_states = self.decoder(words, hidden_states)
@@ -309,16 +332,17 @@ class AdversarialVAE(nn.Module):
                 output_sentences[idx] = next_word_logits
         # if inference mode is on
         else:
+
             sos_token_tensor = torch.LongTensor(
                 [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1)
             word_embs = self.dropout(self.embedding(sos_token_tensor))
             hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
             # Store output sentences
             output_sentences = torch.zeros(
-                mconfig.yelp_max_seq_len, mconfig.batch_size)
+                mconfig.max_seq_len, mconfig.batch_size)
             with torch.no_grad:
                 # Greedily generate new words at a time
-                for idx in range(mconfig.yelp_max_seq_len):
+                for idx in range(mconfig.max_seq_len):
                     hidden_states = self.decoder(word_embs, hidden_states)
                     next_word_probs = nn.Softmax(self.projector(hidden_states))
                     next_words = next_word_probs.argmax(1)
