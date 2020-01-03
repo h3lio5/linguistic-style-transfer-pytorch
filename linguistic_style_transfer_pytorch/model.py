@@ -8,7 +8,7 @@ mconfig = ModelConfig()
 gconfig = GeneralConfig()
 
 
-class AutoEncoder(nn.Module):
+class AdversarialVAE(nn.Module):
     """
     """
 
