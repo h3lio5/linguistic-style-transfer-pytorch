@@ -104,23 +104,31 @@ class AutoEncoder(nn.Module):
 
         #============== KL losses ===========#
         # Style space
-        unweighted_style_kl_loss = self.get_kl_loss(
+        style_kl_loss = self.get_kl_loss(
             style_emb_mu, style_emb_log_sigma)
-        weighted_style_kl_loss = self.get_annealed_weight(
-            iteration, mconfig.style_kl_lambda) * unweighted_style_kl_loss
+        if iteration < mconfig.kl_anneal_iterations:
+            style_kl_loss = self.get_annealed_weight(
+                iteration, mconfig.style_kl_lambda) * style_kl_loss
         # Content space
-        unweighted_content_kl_loss = self.get_kl_loss(
+        content_kl_loss = self.get_kl_loss(
             content_emb_mu, content_emb_log_sigma)
-        weighted_content_kl_loss = self.get_annealed_weight(
-            iteration, mconfig.content_kl_lambda) * unweighted_content_kl_loss
+        if iteration < mconfig.kl_anneal_iterations:
+            content_kl_loss = self.get_annealed_weight(
+                iteration, mconfig.content_kl_lambda) * content_kl_loss
 
         #=============== reconstruction ================#
         reconstructed_sentences = self.generate_sentences(
             sequences, generative_emb)
         reconstruction_loss = self.get_recon_loss(
             reconstructed_sentences, sequences)
+        #================ total weighted loss ==========#
+        autoencoder_loss = mconfig.content_adversary_loss_weight * content_entropy_loss + \
+            mconfig.style_adversary_loss_weight * style_entropy_loss + \
+            mconfig.style_multitask_loss_weight * style_mul_loss + \
+            mconfig.content_multitask_loss_weight * content_mul_loss + \
+            reconstruction_loss
 
-        autoencoder_loss =
+        return content_disc_loss, style_disc_loss, autoencoder_loss
 
     def sample_prior(self, mu, log_sigma):
         """
@@ -196,7 +204,7 @@ class AutoEncoder(nn.Module):
         Returns the entropy loss: negative of the entropy present in the
         input distribution
         """
-        return torch.mean(torch.sum(preds * torch.log(preds), dim=1))
+        return torch.mean(torch.sum(preds * torch.log(preds + mconfig.epsilon), dim=1))
 
     def get_content_mul_loss(self, content_emb, content_bow):
         """
@@ -332,4 +340,5 @@ class AutoEncoder(nn.Module):
         loss = nn.CrossEntropyLoss(ignore_index=0)
         recon_loss = loss(
             output_logits.view(-1, mconfig.vocab_size), input_sentences.view(-1))
+
         return recon_loss
