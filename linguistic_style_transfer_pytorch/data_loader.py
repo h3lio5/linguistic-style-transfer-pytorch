@@ -8,8 +8,6 @@ import json
 gconfig = GeneralConfig()
 mconfig = ModelConfig()
 
-print(type(os.getcwd()))
-
 
 class TextDataset(Dataset):
     """
@@ -30,10 +28,11 @@ class TextDataset(Dataset):
         # load bow vocab
         with open(gconfig.bow_file_path) as f:
             self.bow_filtered_vocab_indices = json.load(f)
+        self.label2index = {'neg': 0, 'pos': 1}
 
     def _padding(self, token_ids):
         """
-        Utility function to add padding to and trim the sentence 
+        Utility function to add padding to and trim the sentence
         """
         if len(token_ids) > mconfig.max_seq_len:
             return token_ids[:mconfig.max_seq_len]
@@ -83,8 +82,7 @@ class TextDataset(Dataset):
             bow_rep : Bag of Words representation of the sentence
         """
         sentence = self.train_data[index]
-        label = self.train_labels[index]
+        label = self.label2index[self.train_labels[index].strip()]
         token_ids, seq_len = self._sentence_tokenid(sentence)
         bow_rep = self._get_bow_representations(sentence)
-        print(type(token_ids), "---", type(bow_rep))
         return (torch.LongTensor(token_ids), torch.LongTensor([seq_len]), torch.LongTensor([label]), torch.FloatTensor(bow_rep))
