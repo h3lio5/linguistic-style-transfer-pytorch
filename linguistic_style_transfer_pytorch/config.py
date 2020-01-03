@@ -1,4 +1,8 @@
 
+import os
+curr_dir = os.getcwd()
+
+
 class GeneralConfig:
     """
     General configuration
@@ -7,18 +11,18 @@ class GeneralConfig:
     def __init__(self):
         self.vocab_size = 9200
         self.bow_hidden_dim = 7526
-        self.vocab_save_path = '../data/'
-        self.train_pos_reviews_file_path = "../data/raw/yelp_train_pos.txt"
-        self.train_neg_reviews_file_path = "../data/raw/yelp_train_neg.txt"
-        self.train_text_file_path = "data/clean/yelp_train_data.txt"
-        self.train_labels_file_path = "data/clean/yelp_train_labels.txt"
-        self.pos_sentiment_file_path = "../data/lexicon/positive-words.txt"
-        self.neg_sentiment_file_path = "../data/lexicon/negative-words.txt"
-        self.word_embedding_file_path = "../data/embedding.txt"
-        self.w2i_file_path = /data/word2index.json"
-        self.i2w_file_path = "data/index2word.json"
-        self.bow_file_path = "data/bow.json"
-        self.model_save_path = "../checkpoints"
+        self.vocab_save_path = curr_dir + "/data"
+        self.train_pos_reviews_file_path = curr_dir + "/data/raw/yelp_train_pos.txt"
+        self.train_neg_reviews_file_path = curr_dir + "/data/raw/yelp_train_neg.txt"
+        self.train_text_file_path = curr_dir + "/data/clean/yelp_train_data.txt"
+        self.train_labels_file_path = curr_dir + "/data/clean/yelp_train_labels.txt"
+        self.pos_sentiment_file_path = curr_dir + "/data/lexicon/positive-words.txt"
+        self.neg_sentiment_file_path = curr_dir + "/data/lexicon/negative-words.txt"
+        self.word_embedding_file_path = curr_dir + "/data/embedding.txt"
+        self.w2i_file_path = curr_dir + "/data/word2index.json"
+        self.i2w_file_path = curr_dir + "/data/index2word.json"
+        self.bow_file_path = curr_dir + "/data/bow.json"
+        self.model_save_path = curr_dir + "/checkpoints"
         self.embedding_size = 300
         self.pad_token = 0
         self.sos_token = 1
