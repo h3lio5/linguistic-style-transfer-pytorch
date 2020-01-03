@@ -14,7 +14,7 @@ class TextDataset(Dataset):
     """
 
     def __init__(self, mode='train'):
-        super(self, TextDataset).__init__()
+        super(TextDataset, self).__init__()
         # load train data
         with open(gconfig.train_text_file_path) as f:
             self.train_data = f.readlines()
@@ -84,4 +84,4 @@ class TextDataset(Dataset):
         token_ids, seq_len = self._sentence_tokenid(sentence)
         bow_rep = self._get_bow_representations(sentence)
 
-        return torch.LongTensor(token_ids), torch.LongTensor(seq_len), torch.LongTensor([label]), torch.FloatTensor(bow_rep)
+        return (torch.LongTensor(token_ids), torch.LongTensor(seq_len), torch.LongTensor([label]), torch.FloatTensor(bow_rep))
