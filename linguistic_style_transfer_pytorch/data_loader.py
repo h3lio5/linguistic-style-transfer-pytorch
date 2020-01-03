@@ -86,5 +86,5 @@ class TextDataset(Dataset):
         label = self.train_labels[index]
         token_ids, seq_len = self._sentence_tokenid(sentence)
         bow_rep = self._get_bow_representations(sentence)
-
+        print(type(token_ids), "---", type(bow_rep))
         return (torch.LongTensor(token_ids), torch.LongTensor([seq_len]), torch.LongTensor([label]), torch.FloatTensor(bow_rep))
