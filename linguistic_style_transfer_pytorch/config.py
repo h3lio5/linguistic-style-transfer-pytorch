@@ -31,12 +31,33 @@ class ModelConfig:
     """
 
     def __init__(self):
+        # batch setting
+        self.batch_size = 128
+        # layer sizes
         self.embedding_size = 300
-        self.max_seq_len = 15
         self.hidden_dim = 256
         self.style_hidden_dim = 8
         self.content_hidden_dim = 128
         self.num_style = 2
         self.content_bow_dim = 7526
-        self.emb_dropout = 0.8
+        # dropout
+        self.dropout = 0.8
+        # sequence length settings
+        self.yelp_max_seq_len = 15
+        self.amazon_max_seq_len = 20
+        # learning rates
+        self.autoencoder_lr = 0.001
+        self.style_adversary_lr = 0.001
+        self.content_adversary_lr = 0.001
+        # loss weights
+        self.style_multitask_loss_weight = 10
+        self.content_multitask_loss_weight = 3
+        self.style_adversary_loss_weight = 1
+        self.content_adversary_loss_weight = 0.03
+        self.style_kl_lambda = 0.03
+        self.content_kl_lambda = 0.03
+        # kl annealing max iterations
+        self.kl_anneal_iterations = 20000
+        # noise
+        self.epsilon = 1e-8
         self.label_smoothing = 0.1
