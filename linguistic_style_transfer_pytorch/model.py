@@ -159,9 +159,17 @@ class AutoEncoder(nn.Module):
 
         return style_mul_loss
 
-    def forward(self, sequences, seq_lengths, style_labels, content_bow):
+    def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration):
         """
-        Returns the logits
+        Args:
+            sequences : token indices of input sentences of shape = (batch_size,max_seq_length)
+            seq_lengths: actual lengths of input sentences before padding, shape = (batch_size,1)
+            style_labels: labels of sentiment of the input sentences, shape = (batch_size,1)
+            content_bow: Bag of Words representations of the input sentences, shape = (batch_size,bow_hidden_size)
+            iteration: number of iterations completed till now; used for KL annealing
+
+        Returns:
+
         """
         embedded_seqs = self.dropout(self.embedding(sequences))
         # pack the sequences to reduce unnecessary computations
@@ -178,7 +186,7 @@ class AutoEncoder(nn.Module):
             content_emb_mu, content_emb_sigma)
         sampled_style_emb = self.sample_prior(style_emb_mu, style_emb_sigma)
 
-        ### Losses on content space ###
+        #=========== Losses on content space =============#
         # Discriminator Loss
         content_disc_preds = self.get_content_disc_preds(sampled_style_emb)
         content_disc_loss = self.get_content_disc_loss(
@@ -189,7 +197,7 @@ class AutoEncoder(nn.Module):
         content_mul_loss = self.get_content_mul_loss(
             sampled_content_emb, content_bow)
 
-        ### Losses on style space ###
+        #============ Losses on style space ================#
         # Discriminator loss
         style_disc_preds = self.get_style_disc_preds(sampled_content_emb)
         style_disc_loss = self.get_style_disc_loss(
@@ -199,3 +207,8 @@ class AutoEncoder(nn.Module):
         # Multitask loss
         style_mul_loss = self.get_style_mul_loss(
             sampled_style_emb, style_labels)
+
+        #============== KL losses ===========#
+        # Style space
+        unweighted_style_kl_loss = self.get_kl_loss(
+            style_emb_mu, style_emb_sigma)
