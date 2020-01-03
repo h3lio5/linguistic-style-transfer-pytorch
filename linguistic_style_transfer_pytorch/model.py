@@ -16,7 +16,7 @@ class AdversarialVAE(nn.Module):
 
     """
 
-    def __init__(self, inference=False):
+    def __init__(self, weight, inference=False):
         """
         Initialize networks
         """
@@ -26,6 +26,7 @@ class AdversarialVAE(nn.Module):
         # word embeddings
         self.embedding = nn.Embedding(
             mconfig.vocab_size, mconfig.embedding_size)
+        self.embedding.weight = nn.Parameter(weight, requires_grad=False)
         #================ Encoder model =============#
         self.encoder = nn.GRU(
             mconfig.embedding_size, mconfig.hidden_dim, batch_first=True, bidirectional=True)
@@ -68,13 +69,18 @@ class AdversarialVAE(nn.Module):
             vae_and_classifier_loss : consists of loss incurred by autoencoder, content and style
                                classifiers
         """
-        embedded_seqs = self.dropout(self.embedding(sequences))
         # pack the sequences to reduce unnecessary computations
+        # It requires the sentences to be sorted in descending order to take
+        # full advantage
+        seq_lengths, perm_index = seq_lengths.sort(descending=True)
+        sequences = sequences[perm_index]
+        embedded_seqs = self.dropout(self.embedding(sequences))
         packed_seqs = pack_padded_sequence(
             embedded_seqs, lengths=seq_lengths, batch_first=True)
         packed_output, (final_hidden_state,
                         final_cell_state) = self.encoder(packed_seqs)
         # get content and style embeddings from the sentence embeddings,i.e. final_hidden_state
+        print("final_h_shape ", final_hidden_state.shape)
         content_emb_mu, content_emb_log_sigma = self.get_content_emb(
             final_hidden_state)
         style_emb_mu, style_emb_log_sigma = self.get_style_emb(
