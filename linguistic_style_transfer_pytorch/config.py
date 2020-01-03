@@ -14,7 +14,9 @@ class GeneralConfig:
         self.pos_sentiment_file_path = "../data/lexicon/positive-words.txt"
         self.neg_sentiment_file_path = "../data/lexicon/negative-words.txt"
         self.word_embedding_file_path = "../data/embedding.txt"
-        self.
+        self.w2i_file_path = "../data/word2index.json"
+        self.i2w_file_path = "../data/index2word.json"
+        self.bow_file_path = "../data/bow.json"
         self.embedding_size = 300
         self.predefined_word_index = {
             "<unk>": 0,
