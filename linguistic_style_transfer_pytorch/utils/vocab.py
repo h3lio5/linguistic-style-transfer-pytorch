@@ -20,8 +20,8 @@ class Vocab:
 
         self.config = config
         self.vocab_size = config.vocab_size
+        self.train_file_path = config.train_text_file_path
         self.vocab_save_path = config.vocab_save_path
-        self.train_file_path = config.train_file_path
         self.predefined_word_index = config.predefined_word_index
         self.filter_sentiment_words = config.filter_sentiment_words
         self.filter_stopwords = config.filter_stopwords
@@ -43,7 +43,7 @@ class Vocab:
                 words.update(line.split())
         # Store only 9200 most common words
         words = words.most_common(self.vocab_size)
-        logging.info("collected {} most common words".format(self.vocab_size))
+        logging.debug("collected {} most common words".format(self.vocab_size))
         # create embedding matrix
         emb_matrix = np.zeros(
             (self.config.vocab_size+len(self.config.predefined_word_index), self.config.embedding_size))
@@ -52,7 +52,7 @@ class Vocab:
             len(self.config.predefined_word_index), self.config.embedding_size)
         # load the pretrained word embeddings
         w2v_model = KeyedVectors.load_word2vec_format(
-            self.config.word_embedding_text_file_path)
+            self.config.word_embedding_text_file_path).wv
 
         # fill the dictionary with special tokens first
         idx = 0
@@ -63,10 +63,11 @@ class Vocab:
         # Create word2index, index2word by iterating over
         # the most common words
         for token in words:
-            if token in w2v_model:
+            if token[0] in w2v_model:
+                print("I'm in")
                 word2index[token[0]] = idx
                 index2word[idx] = token[0]
-                emb_matrix[idx, :] = w2v_model[token]
+                emb_matrix[idx, :] = w2v_model[token[0]]
                 idx = idx + 1
         logging.info("Created embeddings")
         logging.info("Created word2index dictionary")
@@ -80,7 +81,8 @@ class Vocab:
             json.dump(index2word, json_file)
         logging.info("Saved index2word.json at {}".format(
             self.vocab_save_path+'index2word.json'))
-        with open()
+        # Save word embedding file
+        np.save(self.config.word_embedding_path, emb_matrix)
         # create bow vocab
         self._populate_word_blacklist(word2index)
 
