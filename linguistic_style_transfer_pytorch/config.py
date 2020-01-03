@@ -6,6 +6,7 @@ class GeneralConfig:
 
     def __init__(self):
         self.vocab_size = 9200
+        self.bow_hidden_dim = 7526
         self.vocab_save_path = '../data/'
         self.train_pos_reviews_file_path = "../data/raw/yelp_train_pos.txt"
         self.train_neg_reviews_file_path = "../data/raw/yelp_train_neg.txt"
@@ -18,10 +19,13 @@ class GeneralConfig:
         self.i2w_file_path = "../data/index2word.json"
         self.bow_file_path = "../data/bow.json"
         self.embedding_size = 300
+        self.pad_token = 0
+        self.sos_token = 1
+        self.unk_token = 2
         self.predefined_word_index = {
-            "<unk>": 0,
+            "<pad>": 0,
             "<sos>": 1,
-            "<eos>": 2,
+            "<unk>": 2,
         }
         self.filter_sentiment_words = True
         self.filter_stopwords = True
@@ -48,8 +52,8 @@ class ModelConfig:
         # dropout
         self.dropout = 0.8
         # sequence length settings
-        self.yelp_max_seq_len = 15
-        self.amazon_max_seq_len = 20
+        self.max_seq_len = 15
+
         # learning rates
         self.autoencoder_lr = 0.001
         self.style_adversary_lr = 0.001
