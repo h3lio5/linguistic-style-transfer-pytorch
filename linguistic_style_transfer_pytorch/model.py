@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from linguistic_style_transfer_pytorch.config import ModelConfig, GeneralConfig
 from torch.nn.utils.rnn import pack_padded_sequence
-
+import math
 
 mconfig = ModelConfig()
 gconfig = GeneralConfig()
@@ -49,7 +49,7 @@ class AutoEncoder(nn.Module):
 
     def sample_prior(self, mu, log_sigma):
         """
-        Returns samples drawn from the latent space constrained to 
+        Returns samples drawn from the latent space constrained to
         follow diagonal Gaussian
         """
         epsilon = torch.randn(mu.size(1))
@@ -71,7 +71,7 @@ class AutoEncoder(nn.Module):
 
     def get_content_disc_loss(self, content_disc_preds, content_bow):
         """
-        It essentially quantifies the amount of information about content  
+        It essentially quantifies the amount of information about content
         contained in the style space
         Returns:
         cross entropy loss of content discriminator
@@ -88,7 +88,7 @@ class AutoEncoder(nn.Module):
 
     def get_style_disc_preds(self, content_emb):
         """
-        Returns predictions about style using content embeddings 
+        Returns predictions about style using content embeddings
         as input
         output shape: [batch_size,num_style]
         """
@@ -102,7 +102,7 @@ class AutoEncoder(nn.Module):
 
     def get_style_disc_loss(self, style_disc_preds, style_labels):
         """
-        It essentially quantifies the amount of information about style  
+        It essentially quantifies the amount of information about style
         contained in the content space
         Returns:
         cross entropy loss of style discriminator
@@ -125,7 +125,7 @@ class AutoEncoder(nn.Module):
 
     def get_content_mul_loss(self, content_emb, content_bow):
         """
-        This loss quantifies the amount of content information preserved 
+        This loss quantifies the amount of content information preserved
         in the content space
         Returns:
         cross entropy loss of the content classifier
@@ -143,7 +143,7 @@ class AutoEncoder(nn.Module):
 
     def get_style_mul_loss(self, style_emb, style_labels):
         """
-        This loss quantifies the amount of style information preserved 
+        This loss quantifies the amount of style information preserved
         in the style space
         Returns:
         cross entropy loss of the style classifier
@@ -158,6 +158,41 @@ class AutoEncoder(nn.Module):
         style_mul_loss = nn.BCELoss(preds, smoothed_style_labels)
 
         return style_mul_loss
+
+    def get_annealed_weight(self, iteration, lambda_weight):
+        """
+        Args:
+            iteration(int): Number of iterations compeleted till now
+            lambda_weight(float): KL penalty weight
+        Returns:
+            Annealed weight(float)
+        """
+        return (math.tanh(
+            (iteration - mconfig.kl_anneal_iterations * 1.5) /
+            (mconfig.kl_anneal_iterations / 3))
+            + 1) * lambda_weight
+
+    def get_kl_loss(self, mu, log_sigma):
+        """
+        Args:
+            mu: batch of means of the gaussian distribution followed by the latent variables
+            log_sigma: batch of log variances(log_sigma) of the gaussian distribution followed by the latent variables
+        Returns:
+            total loss(float)
+        """
+        kl_loss = (-0.5*torch.sum(1+log_sigma -
+                                  log_sigma.exp()-mu.pow(2), dim=1)).mean()
+        return kl_loss
+
+     def generate_sentences(self,input_sentences,latent_emb):
+         """
+         Args:
+            input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
+            latent_emb: generative embedding formed by the concatenation of sampled style and 
+                        content latent embeddings, shape = (batch_size,mconfig.)
+         Returns:
+
+         """   
 
     def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration):
         """
@@ -178,13 +213,18 @@ class AutoEncoder(nn.Module):
         packed_output, (final_hidden_state,
                         final_cell_state) = self.encoder(packed_seqs)
         # get content and style embeddings from the sentence embeddings,i.e. final_hidden_state
-        content_emb_mu, content_emb_sigma = self.get_content_emb(
+        content_emb_mu, content_emb_log_sigma = self.get_content_emb(
             final_hidden_state)
-        style_emb_mu, style_emb_sigma = self.get_style_emb(final_hidden_state)
+        style_emb_mu, style_emb_log_sigma = self.get_style_emb(
+            final_hidden_state)
         # sample content and style embeddings from their respective latent spaces
         sampled_content_emb = self.sample_prior(
-            content_emb_mu, content_emb_sigma)
-        sampled_style_emb = self.sample_prior(style_emb_mu, style_emb_sigma)
+            content_emb_mu, content_emb_log_sigma)
+        sampled_style_emb = self.sample_prior(
+            style_emb_mu, style_emb_log_sigma)
+        # Generative embedding
+        generative_emb = torch.cat(
+            sampled_style_emb, sampled_content_emb, dim=1)
 
         #=========== Losses on content space =============#
         # Discriminator Loss
@@ -211,4 +251,15 @@ class AutoEncoder(nn.Module):
         #============== KL losses ===========#
         # Style space
         unweighted_style_kl_loss = self.get_kl_loss(
-            style_emb_mu, style_emb_sigma)
+            style_emb_mu, style_emb_log_sigma)
+        weighted_style_kl_loss = self.get_annealed_weight(
+            iteration, mconfig.style_kl_lambda) * unweighted_style_kl_loss
+        # Content space
+        unweighted_content_kl_loss = self.get_kl_loss(
+            content_emb_mu, content_emb_log_sigma)
+        weighted_content_kl_loss = self.get_annealed_weight(
+            iteration, mconfig.content_kl_lambda) * unweighted_content_kl_loss
+
+        #=============== reconstruction ================#
+        reconstructed_sentences = self.generate_sentences(
+            sequences, generative_emb)
