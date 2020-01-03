@@ -4,8 +4,8 @@ from linguistic_style_transfer_pytorch.config import GeneralConfig, ModelConfig
 from linguistic_style_transfer_pytorch.data_loader import TextDataset
 from linguistic_style_transfer_pytorch.model import AdversarialVAE
 from tqdm import tqdm, trange
-import argparse
 import os
+import numpy as np
 
 use_cuda = True if torch.cuda.is_available() else False
 
@@ -14,7 +14,8 @@ if __name__ == "__main__":
 
     mconfig = ModelConfig()
     gconfig = GeneralConfig()
-    model = AdversarialVAE(inference=False)
+    weights = torch.FloatTensor(np.load(gconfig.word_embedding_path))
+    model = AdversarialVAE(inference=False, weight=weights)
     if use_cuda:
         model = model.cuda()
 
@@ -44,9 +45,8 @@ if __name__ == "__main__":
                 seq_lens = seq_lens.cuda()
                 labels = labels.cuda()
                 bow_rep = bow_rep.cuda()
-
-            content_disc_loss, style_disc_loss, vae_and_cls_loss = model(sequences.squeeze(
-                1), seq_lens.squeeze(1), labels.squeeze(1), bow_rep.squeeze(1), iteration+1)
+            content_disc_loss, style_disc_loss, vae_and_cls_loss = model(
+                sequences, seq_lens.squeeze(1), labels, bow_rep, iteration+1)
 
             #============== Update Adversary/Discriminator parameters ===========#
             # update content discriminator parametes
