@@ -148,8 +148,9 @@ class AdversarialVAE(nn.Module):
 
         content_disc_params = self.content_disc.parameters()
         style_disc_params = self.style_disc.parameters()
-        other_params = [self.encoder.parameters(), self.decoder.parameters(),
-                        self.style_classifier.parameters(), self.content_classifier.parameters()]
+        other_params = list(self.encoder.parameters()) + list(self.decoder.parameters()) + \
+            list(self.style_classifier.parameters()) + \
+            list(self.content_classifier.parameters())
 
         return content_disc_params, style_disc_params, other_params
 
