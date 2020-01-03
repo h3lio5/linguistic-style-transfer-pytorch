@@ -1,11 +1,12 @@
+from linguistic_style_transfer_pytorch.config import GeneralConfig
+import json
+import numpy as np
+import collections
+import logging
 from nltk.corpus import stopwords
 from sklearn.feature_extraction import stop_words
 from spacy.lang.en.stop_words import STOP_WORDS as spacy_stopwords
-import logging
-import collections
-import numpy as np
-import json
-from linguistic_style_transfer_pytorch.config import GeneralConfig
+from gensim.models import KeyedVectors
 
 # Part of Code taken from https://github.com/vineetjohn/linguistic-style-transfer/tree/master/linguistic_style_transfer_model/utils
 
@@ -43,13 +44,31 @@ class Vocab:
         # Store only 9200 most common words
         words = words.most_common(self.vocab_size)
         logging.info("collected {} most common words".format(self.vocab_size))
+        # create embedding matrix
+        emb_matrix = np.zeros(
+            (self.config.vocab_size+len(self.config.predefined_word_index), self.config.embedding_size))
+        # randomly initialize the special tokens
+        emb_matrix[:len(self.config.predefined_word_index), :] = np.random.rand(
+            len(self.config.predefined_word_index), self.config.embedding_size)
+        # load the pretrained word embeddings
+        w2v_model = KeyedVectors.load_word2vec_format(
+            self.config.word_embedding_text_file_path)
+
+        # fill the dictionary with special tokens first
+        idx = 0
+        for word, index in self.config.predefined_word_index.items():
+            word2index[word] = index
+            index2word[index] = word
+            idx += 1
         # Create word2index, index2word by iterating over
         # the most common words
         for token in words:
-            word2index[token[0]] = i
-            i = i + 1
-            index2word[i] = token[0]
-
+            if token in w2v_model:
+                word2index[token[0]] = idx
+                index2word[idx] = token[0]
+                emb_matrix[idx, :] = w2v_model[token]
+                idx = idx + 1
+        logging.info("Created embeddings")
         logging.info("Created word2index dictionary")
         logging.info("Created index2word dictionary")
         # Saving the vocab file
@@ -61,6 +80,7 @@ class Vocab:
             json.dump(index2word, json_file)
         logging.info("Saved index2word.json at {}".format(
             self.vocab_save_path+'index2word.json'))
+        with open()
         # create bow vocab
         self._populate_word_blacklist(word2index)
 
