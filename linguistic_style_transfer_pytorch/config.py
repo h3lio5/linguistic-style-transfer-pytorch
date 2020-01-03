@@ -38,6 +38,8 @@ class ModelConfig:
         self.hidden_dim = 256
         self.style_hidden_dim = 8
         self.content_hidden_dim = 128
+        # generative embedding dim = style_hidden_dim + content_hidden_dim
+        self.generative_emb_dim = 136
         self.num_style = 2
         self.content_bow_dim = 7526
         # dropout
