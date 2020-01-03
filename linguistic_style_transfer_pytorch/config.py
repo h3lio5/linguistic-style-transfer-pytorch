@@ -31,6 +31,7 @@ class ModelConfig:
     """
 
     def __init__(self):
+        self.vocab_size = 9200
         # batch setting
         self.batch_size = 128
         # layer sizes
