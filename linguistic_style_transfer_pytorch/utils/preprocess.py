@@ -33,11 +33,15 @@ logging.info("Writing train dataset")
 with open(config.train_text_file_path, 'w') as text_file, open(config.train_labels_file_path, 'w') as labels_file:
     with open(config.train_pos_reviews_file_path, 'r') as reviews_file:
         for line in reviews_file:
-            text_file.write(clean_text(line) + "\n")
-            labels_file.write("pos" + "\n")
+            line = clean_text(line)
+            if len(line) > 0:
+                text_file.write(clean_text(line) + "\n")
+                labels_file.write("pos" + "\n")
     with open(config.train_neg_reviews_file_path, 'r') as reviews_file:
         for line in reviews_file:
-            text_file.write(clean_text(line) + "\n")
-            labels_file.write("neg" + "\n")
+            line = clean_text(line)
+            if len(line) > 0:
+                text_file.write(clean_text(line) + "\n")
+                labels_file.write("pos" + "\n")
 
 logging.info("Processing complete")
