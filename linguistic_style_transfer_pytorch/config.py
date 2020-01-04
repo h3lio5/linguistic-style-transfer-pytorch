@@ -5,6 +5,7 @@ class GeneralConfig:
     """
 
     def __init__(self):
+        # original vocab size
         self.vocab_size = 9200
         self.bow_hidden_dim = 7526
         self.vocab_save_path = '/Users/akashsm/Documents/linguistic-style-transfer-pytorch/linguistic_style_transfer_pytorch/data/'
@@ -39,7 +40,8 @@ class ModelConfig:
     """
 
     def __init__(self):
-        self.vocab_size = 9200
+        # vocab size after including special tokens
+        self.vocab_size = 9203
         self.epochs = 20
         # batch setting
         self.batch_size = 128
