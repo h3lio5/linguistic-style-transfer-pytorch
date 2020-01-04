@@ -10,7 +10,7 @@ gconfig = GeneralConfig()
 
 class AdversarialVAE(nn.Module):
     """
-    Model architecture defined according to the paper 
+    Model architecture defined according to the paper
     'Disentangled Representation Learning for Non-Parallel Text Style Transfer'
     https://www.aclweb.org/anthology/P19-1041.pdf
 
@@ -208,7 +208,8 @@ class AdversarialVAE(nn.Module):
         # Note: detach the style embedding since when don't want the gradient to flow
         #       all the way to the encoder. content_disc_loss is used only to change the
         #       parameters of the discriminator network
-        preds = nn.Softmax()(self.content_disc(self.dropout(style_emb.detach())))
+        preds = nn.Softmax(dim=1)(self.content_disc(
+            self.dropout(style_emb.detach())))
 
         return preds
 
@@ -224,7 +225,6 @@ class AdversarialVAE(nn.Module):
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.content_bow_dim
         # calculate cross entropy loss
-        print(smoothed_content_bow.shape, content_disc_preds.shape)
         content_disc_loss = nn.BCELoss()(content_disc_preds, smoothed_content_bow)
 
         return content_disc_loss
@@ -239,7 +239,8 @@ class AdversarialVAE(nn.Module):
         # Note: detach the content embedding since when don't want the gradient to flow
         #       all the way to the encoder. style_disc_loss is used only to change the
         #       parameters of the discriminator network
-        preds = nn.Softmax()(self.style_disc(self.dropout(content_emb.detach())))
+        preds = nn.Softmax(dim=1)(self.style_disc(
+            self.dropout(content_emb.detach())))
 
         return preds
 
@@ -255,7 +256,7 @@ class AdversarialVAE(nn.Module):
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        print("shapes ", smoothed_style_labels.shape, style_disc_preds.shape)
+
         style_disc_loss = nn.BCELoss()(style_disc_preds, smoothed_style_labels)
 
         return style_disc_loss
@@ -275,7 +276,8 @@ class AdversarialVAE(nn.Module):
         cross entropy loss of the content classifier
         """
         # predictions
-        preds = nn.Softmax()(self.content_classifier(self.dropout(content_emb)))
+        preds = nn.Softmax(dim=1)(
+            self.content_classifier(self.dropout(content_emb)))
         # label smoothing
         smoothed_content_bow = content_bow * \
             (1-mconfig.label_smoothing) + \
@@ -293,13 +295,14 @@ class AdversarialVAE(nn.Module):
         cross entropy loss of the style classifier
         """
         # predictions
-        preds = nn.Softmax()(self.style_classifier(self.dropout(style_emb)))
+        preds = nn.Softmax(dim=1)(
+            self.style_classifier(self.dropout(style_emb)))
         # label smoothing
         smoothed_style_labels = style_labels * \
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
-        style_mul_loss = nn.BCELoss(preds, smoothed_style_labels)
+        style_mul_loss = nn.BCELoss()(preds, smoothed_style_labels)
 
         return style_mul_loss
 
@@ -332,11 +335,11 @@ class AdversarialVAE(nn.Module):
         """
         Args:
            input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
-           latent_emb: generative embedding formed by the concatenation of sampled style and 
+           latent_emb: generative embedding formed by the concatenation of sampled style and
                        content latent embeddings, shape = (batch_size,mconfig.)
         Returns:
             output_sentences: batch of token indices or logits of generated sentences based on the
-            mode of operation. 
+            mode of operation.
             modes:
                 train: shape = (max_seq_len,batch_size,vocab_size)
                 inference: shape = (max_seq_len,batch_size)
@@ -350,8 +353,9 @@ class AdversarialVAE(nn.Module):
                 (sos_token_tensor, input_sentences), dim=1)
             sentence_embs = self.dropout(self.embedding(input_sentences))
             # Make the latent embedding compatible for concatenation
+            # by repeating it for max_seq_len + 1(additional one bcoz <sos> tokens were added)
             latent_emb = latent_emb.unsqueeze(1).repeat(
-                1, mconfig.max_seq_len, 1)
+                1, mconfig.max_seq_len+1, 1)
             gen_sent_embs = torch.cat(
                 (sentence_embs, latent_emb), dim=2)
             # Delete latent embedding and sos token tensor to reduce memory usage
