@@ -28,7 +28,7 @@ class TextDataset(Dataset):
         # load bow vocab
         with open(gconfig.bow_file_path) as f:
             self.bow_filtered_vocab_indices = json.load(f)
-        self.label2index = {'neg': 0, 'pos': 1}
+        self.label2index = {'neg': [0, 1], 'pos': [1, 0]}
 
     def _padding(self, token_ids):
         """
@@ -85,4 +85,4 @@ class TextDataset(Dataset):
         label = self.label2index[self.train_labels[index].strip()]
         token_ids, seq_len = self._sentence_tokenid(sentence)
         bow_rep = self._get_bow_representations(sentence)
-        return (torch.LongTensor(token_ids), torch.LongTensor([seq_len]), torch.LongTensor([label]), torch.FloatTensor(bow_rep))
+        return (torch.LongTensor(token_ids), torch.LongTensor([seq_len]), torch.LongTensor(label), torch.FloatTensor(bow_rep))
