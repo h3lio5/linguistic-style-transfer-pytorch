@@ -50,14 +50,24 @@ if __name__ == "__main__":
 
             #============== Update Adversary/Discriminator parameters ===========#
             # update content discriminator parametes
-            content_disc_loss.backward()
+            # we need to retain the computation graph so that discriminator predictions are
+            # not freed as we need them to calculate entropy.
+            # Note that even even detaching the discriminator branch won't help us since it
+            # will be freed and delete all the intermediary values(predictions, in our case).
+            # Hence, with no access to this branch we can't backprop the entropy loss
+            content_disc_loss.backward(retain_graph=True)
             content_disc_opt.step()
+            content_disc_opt.zero_grad()
+
             # update style discriminator parameters
-            style_disc_loss.backward()
+            style_disc_loss.backward(retain_graph=True)
             style_disc_opt.step()
+            style_disc_opt.zero_grad()
+
             #=============== Update VAE and classifier parameters ===============#
             vae_and_cls_loss.backward()
             vae_and_cls_opt.step()
+            vae_and_cls_opt.zero_grad()
 
         print("Saving states")
         #================ Saving states ==========================#
@@ -67,7 +77,7 @@ if __name__ == "__main__":
         torch.save(model.state_dict(), gconfig.model_save_path +
                    f'/model_epoch_{epoch}.pt')
         # save optimizers states
-        torch.save({'c_disc': content_disc_opt.state_dict(
-        ), 's_disc': style_disc_opt.state_dict(), 'ae_cls': vae_and_cls_opt.state_dict()}, gconfig.model_save_path+'/opt_epoch_{epoch}.pt')
+        torch.save({'content_disc': content_disc_opt.state_dict(
+        ), 'style_disc': style_disc_opt.state_dict(), 'vae_and_cls': vae_and_cls_opt.state_dict()}, gconfig.model_save_path+'/opt_epoch_{epoch}.pt')
 
     print("Training completed!!!")
