@@ -71,7 +71,7 @@ class AdversarialVAE(nn.Module):
             content_disc_loss: loss incurred by content discriminator/adversary
             style_disc_loss  : loss incurred by style discriminator/adversary
             vae_and_classifier_loss : consists of loss incurred by autoencoder, content and style
-                               classifiers
+                                      classifiers
         """
         # pack the sequences to reduce unnecessary computations
         # It requires the sentences to be sorted in descending order to take
@@ -404,6 +404,10 @@ class AdversarialVAE(nn.Module):
         """
 
         loss = nn.CrossEntropyLoss(ignore_index=0)
+        print("output_logits ", output_logits.shape,
+              "input_sentences ", input_sentences.shape)
+        print("o_sent aft", output_logits.view(-1, mconfig.vocab_size).shape,
+              "inp_sent aft", input_sentences.view(-1).shape)
         recon_loss = loss(
             output_logits.view(-1, mconfig.vocab_size), input_sentences.view(-1))
 
