@@ -16,11 +16,12 @@ class AdversarialVAE(nn.Module):
 
     """
 
-    def __init__(self, weight, inference=False):
+    def __init__(self, weight, device, inference=False):
         """
         Initialize networks
         """
         super(AdversarialVAE, self).__init__()
+        self.device = device
         # Inference mode or training mode
         self.inference = inference
         # word embeddings
@@ -195,7 +196,7 @@ class AdversarialVAE(nn.Module):
         Returns samples drawn from the latent space constrained to
         follow diagonal Gaussian
         """
-        epsilon = torch.randn(mu.size(1))
+        epsilon = torch.randn(mu.size(1), device=self.device)
         return mu + epsilon*torch.exp(log_var)
 
     def get_content_disc_preds(self, style_emb):
@@ -252,7 +253,7 @@ class AdversarialVAE(nn.Module):
         cross entropy loss of style discriminator
         """
         # label smoothing
-        smoothed_style_labels = style_labels * \
+        smoothed_style_labels = style_labels.to(torch.float) * \
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
@@ -298,7 +299,7 @@ class AdversarialVAE(nn.Module):
         preds = nn.Softmax(dim=1)(
             self.style_classifier(self.dropout(style_emb)))
         # label smoothing
-        smoothed_style_labels = style_labels * \
+        smoothed_style_labels = style_labels.to(torch.float) * \
             (1-mconfig.label_smoothing) + \
             mconfig.label_smoothing/mconfig.num_style
         # calculate cross entropy loss
@@ -347,8 +348,8 @@ class AdversarialVAE(nn.Module):
         # Training mode
         if not self.inference:
             # Prepend the input sentences with <sos> token
-            sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1)
+            sos_token_tensor = torch.tensor(
+                [gconfig.predefined_word_index['<sos>']], device=self.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             input_sentences = torch.cat(
                 (sos_token_tensor, input_sentences), dim=1)
             sentence_embs = self.dropout(self.embedding(input_sentences))
@@ -360,10 +361,10 @@ class AdversarialVAE(nn.Module):
                 (sentence_embs, latent_emb), dim=2)
             # Delete latent embedding and sos token tensor to reduce memory usage
             del latent_emb, sos_token_tensor
-            output_sentences = torch.zeros(
-                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size)
+            output_sentences = torch.zeros((
+                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size), device=self.device)
             # initialize hidden state
-            hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
+            hidden_states = torch.zeros((mconfig.batch_size, mconfig.hidden_dim), device=self.device)
             # generate sentences one word at a time in a loop
             for idx in range(mconfig.max_seq_len):
                 # get words at the index idx from all the batches
@@ -375,13 +376,13 @@ class AdversarialVAE(nn.Module):
         # if inference mode is on
         else:
 
-            sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1)
+            sos_token_tensor = torch.tensor((
+                [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1), device=self.device)
             word_embs = self.dropout(self.embedding(sos_token_tensor))
-            hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
+            hidden_states = torch.zeros((mconfig.batch_size, mconfig.hidden_dim), device=self.device)
             # Store output sentences
-            output_sentences = torch.zeros(
-                mconfig.max_seq_len, mconfig.batch_size)
+            output_sentences = torch.zeros((
+                mconfig.max_seq_len, mconfig.batch_size), device=self.device)
             with torch.no_grad:
                 # Greedily generate new words at a time
                 for idx in range(mconfig.max_seq_len):
