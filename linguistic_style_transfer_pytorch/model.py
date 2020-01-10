@@ -16,13 +16,11 @@ class AdversarialVAE(nn.Module):
 
     """
 
-    def __init__(self, weight, inference=False):
+    def __init__(self, weight):
         """
         Initialize networks
         """
         super(AdversarialVAE, self).__init__()
-        # Inference mode or training mode
-        self.inference = inference
         # word embeddings
         self.embedding = nn.Embedding.from_pretrained(weight)
         #================ Encoder model =============#
