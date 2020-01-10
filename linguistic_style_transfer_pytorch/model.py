@@ -368,13 +368,14 @@ class AdversarialVAE(nn.Module):
                                              log_var.exp()-mu.pow(2), dim=1)))
         return kl_loss
 
-    def generate_sentences(self, input_sentences, latent_emb):
+    def generate_sentences(self, input_sentences, latent_emb, inference=False):
         """
         Args:
             latent_emb: generative embedding formed by the concatenation of sampled style and
                        content latent embeddings, shape = (batch_size,mconfig.generative_emb_dim)
             input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
                             It is of type 'None' when the function is called in inference mode
+            inference: bool indicating whether train/inference mode
         Returns:
             output_sentences: batch of token indices or logits of generated sentences based on the
             mode of operation.
@@ -383,7 +384,7 @@ class AdversarialVAE(nn.Module):
                 inference: shape = (max_seq_len,batch_size)
         """
         # Training mode
-        if not self.inference:
+        if not inference:
             # Prepend the input sentences with <sos> token
             sos_token_tensor = torch.LongTensor(
                 [gconfig.predefined_word_index['<sos>']], device=input_sentences.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
@@ -486,6 +487,6 @@ class AdversarialVAE(nn.Module):
             (target_style_emb.unsqueeze(0).repeat(batch_size, 1), sampled_content_emb), axis=1)
         # Generate the style transfered sentences
         transfered_sentences = self.generate_sentences(
-            latent_emb=generative_emb)
+            input_sentences=None, latent_emb=generative_emb, inference=True)
 
         return transfered_sentences.transpose(0, 1)
