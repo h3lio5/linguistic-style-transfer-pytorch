@@ -6,6 +6,7 @@ from linguistic_style_transfer_pytorch.model import AdversarialVAE
 from tqdm import tqdm, trange
 import os
 import numpy as np
+import pickle
 
 use_cuda = True if torch.cuda.is_available() else False
 
@@ -76,7 +77,9 @@ if __name__ == "__main__":
         # save model state
         torch.save(model.state_dict(), gconfig.model_save_path +
                    f'/model_epoch_{epoch}.pt')
-
+        # Save approximate estimate of different style embeddings
+        with open(gconfig.model_save_path+'/avg_style_emb.pkl') as f:
+            pickle.dump(model.avg_style_emb, f)
         # save optimizers states
         torch.save({'content_disc': content_disc_opt.state_dict(
         ), 'style_disc': style_disc_opt.state_dict(), 'vae_and_cls': vae_and_cls_opt.state_dict()}, gconfig.model_save_path+'/opt_epoch_{epoch}.pt')
