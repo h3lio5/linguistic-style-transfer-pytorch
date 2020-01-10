@@ -55,6 +55,15 @@ class AdversarialVAE(nn.Module):
         self.decoder = nn.GRUCell(
             mconfig.embedding_size + mconfig.generative_emb_dim, mconfig.hidden_dim)
         self.projector = nn.Linear(mconfig.hidden_dim, mconfig.vocab_size)
+        #============== Average label embedding ======#
+        # Used during inference to transfer style.
+        # Each element of the dict consists of average of latent style embeddings
+        # of all the sentences of that particular label/style.
+        # 0 -> negative, 1 -> positive
+        self.avg_label_emb = {
+            0: torch.zeros(mconfig.style_hidden_dim),
+            1: torch.zeros(mconfig.style_hidden_dim)
+        }
         # dropout
         self.dropout = nn.Dropout(mconfig.dropout)
 
@@ -331,12 +340,13 @@ class AdversarialVAE(nn.Module):
                                              log_var.exp()-mu.pow(2), dim=1)))
         return kl_loss
 
-    def generate_sentences(self, input_sentences, latent_emb):
+    def generate_sentences(self, input_sentences=None, latent_emb):
         """
         Args:
            input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
+                            It is of type 'None' when the function is called in inference mode
            latent_emb: generative embedding formed by the concatenation of sampled style and
-                       content latent embeddings, shape = (batch_size,mconfig.)
+                       content latent embeddings, shape = (batch_size,mconfig.generative_emb_dim)
         Returns:
             output_sentences: batch of token indices or logits of generated sentences based on the
             mode of operation.
@@ -348,7 +358,7 @@ class AdversarialVAE(nn.Module):
         if not self.inference:
             # Prepend the input sentences with <sos> token
             sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1)
+                [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             input_sentences = torch.cat(
                 (sos_token_tensor, input_sentences), dim=1)
             sentence_embs = self.dropout(self.embedding(input_sentences))
@@ -361,9 +371,10 @@ class AdversarialVAE(nn.Module):
             # Delete latent embedding and sos token tensor to reduce memory usage
             del latent_emb, sos_token_tensor
             output_sentences = torch.zeros(
-                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size)
+                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size, device=latent_emb.device)
             # initialize hidden state
-            hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
+            hidden_states = torch.zeros(
+                mconfig.batch_size, mconfig.hidden_dim, device=latent_emb.device)
             # generate sentences one word at a time in a loop
             for idx in range(mconfig.max_seq_len):
                 # get words at the index idx from all the batches
@@ -376,17 +387,19 @@ class AdversarialVAE(nn.Module):
         else:
 
             sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']]).unsqueeze(0).repeat(mconfig.batch_size, 1)
+                [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             word_embs = self.dropout(self.embedding(sos_token_tensor))
-            hidden_states = torch.zeros(mconfig.batch_size, mconfig.hidden_dim)
+            hidden_states = torch.zeros(
+                mconfig.batch_size, mconfig.hidden_dim, device=latent_emb.device)
             # Store output sentences
             output_sentences = torch.zeros(
-                mconfig.max_seq_len, mconfig.batch_size)
+                mconfig.max_seq_len, mconfig.batch_size, device=latent_emb.device)
             with torch.no_grad:
                 # Greedily generate new words at a time
                 for idx in range(mconfig.max_seq_len):
                     hidden_states = self.decoder(word_embs, hidden_states)
-                    next_word_probs = nn.Softmax(self.projector(hidden_states))
+                    next_word_probs = nn.Softmax(dim=1)(
+                        self.projector(hidden_states))
                     next_words = next_word_probs.argmax(1)
                     output_sentences[idx] = next_words
                     word_embs = self.dropout(self.embedding(next_words))
@@ -408,3 +421,41 @@ class AdversarialVAE(nn.Module):
             output_logits.view(-1, mconfig.vocab_size), input_sentences.view(-1))
 
         return recon_loss
+
+    def transfer_style(self, sequences, seq_lengths, style):
+        """
+        Args:
+            sequences : token indices of input sentences of shape = (batch_size,max_seq_length) 
+            seq_lengths: actual lengths of input sentences before padding, shape = (batch_size,1)
+            style: style of the transformed sentences
+        Returns:
+
+        """
+        # pack the sequences to reduce unnecessary computations
+        # It requires the sentences to be sorted in descending order to take
+        # full advantage
+        batch_size = sequences.size(0)
+        seq_lengths, perm_index = seq_lengths.sort(descending=True)
+        sequences = sequences[perm_index]
+        embedded_seqs = self.dropout(self.embedding(sequences))
+        packed_seqs = pack_padded_sequence(
+            embedded_seqs, lengths=seq_lengths, batch_first=True)
+        packed_output, (_) = self.encoder(packed_seqs)
+        output, _ = pad_packed_sequence(packed_output, batch_first=True)
+        sentence_emb = output[torch.arange(batch_size), seq_lengths-1]
+        # get content embeddings
+        # Note that we need not calculate style embeddings since we
+        # use the target style embedding
+        content_emb_mu, content_emb_log_var = self.get_content_emb(
+            sentence_emb)
+        # sample content embeddings latent space
+        sampled_content_emb = self.sample_prior(
+            content_emb_mu, content_emb_log_var)
+        # Get the approximate estimate of the target style embedding
+        target_style_emb = self.avg_label_emb[style]
+        # Generative embedding
+        generative_emb = torch.cat(
+            (target_style_emb.unsqueeze(0).repeat(batch_size, 1), sampled_content_emb), axis=1)
+        # Generate the style transfered sentences
+        transfered_sentences = self.generate_sentences(
+            latent_emb=generative_emb)
