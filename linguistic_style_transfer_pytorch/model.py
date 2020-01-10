@@ -205,6 +205,15 @@ class AdversarialVAE(nn.Module):
         epsilon = torch.randn(mu.size(1))
         return mu + epsilon*torch.exp(log_var)
 
+    def get_average_style_emb(self, style_emb, style_labels):
+        """
+        Args:
+            style_emb: batch of sampled style embeddings of the input sentences,shape = (batch_size,mconfig.style_hidden_dim)
+            style_labels: style labels of the corresponding input sentences,shape = (batch_size,1)
+        """
+        # Iterate over the style labels
+        for label in style_labels:
+
     def get_content_disc_preds(self, style_emb):
         """
         Returns predictions about the content using style embedding
@@ -427,7 +436,7 @@ class AdversarialVAE(nn.Module):
             seq_lengths: actual lengths of input sentences before padding, shape = (batch_size,1)
             style: style of the transformed sentences
         Returns:
-
+            transfered_sentences: token indices of style transfered sentences, shape=(batch_size,maz_seq_length)
         """
         # pack the sequences to reduce unnecessary computations
         # It requires the sentences to be sorted in descending order to take
@@ -457,3 +466,5 @@ class AdversarialVAE(nn.Module):
         # Generate the style transfered sentences
         transfered_sentences = self.generate_sentences(
             latent_emb=generative_emb)
+
+        return transfered_sentences.transpose(0, 1)
