@@ -24,9 +24,7 @@ class AdversarialVAE(nn.Module):
         # Inference mode or training mode
         self.inference = inference
         # word embeddings
-        self.embedding = nn.Embedding(
-            mconfig.vocab_size, mconfig.embedding_size)
-        self.embedding.weight = nn.Parameter(weight, requires_grad=False)
+        self.embedding = nn.Embedding.from_pretrained(weight)
         #================ Encoder model =============#
         self.encoder = nn.GRU(
             mconfig.embedding_size, mconfig.hidden_dim, batch_first=True, bidirectional=True)
