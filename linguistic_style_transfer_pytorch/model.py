@@ -62,6 +62,9 @@ class AdversarialVAE(nn.Module):
             0: torch.zeros(mconfig.style_hidden_dim),
             1: torch.zeros(mconfig.style_hidden_dim)
         }
+        # Used to maintain a running average
+        self.num_neg_styles = 0
+        self.num_pos_styles = 0
         # dropout
         self.dropout = nn.Dropout(mconfig.dropout)
 
@@ -70,7 +73,7 @@ class AdversarialVAE(nn.Module):
         Args:
             sequences : token indices of input sentences of shape = (batch_size,max_seq_length)
             seq_lengths: actual lengths of input sentences before padding, shape = (batch_size,1)
-            style_labels: labels of sentiment of the input sentences, shape = (batch_size,1)
+            style_labels: labels of sentiment of the input sentences, shape = (batch_size,2)
             content_bow: Bag of Words representations of the input sentences, shape = (batch_size,bow_hidden_size)
             iteration: number of iterations completed till now; used for KL annealing
 
@@ -104,6 +107,10 @@ class AdversarialVAE(nn.Module):
         # Generative embedding
         generative_emb = torch.cat(
             (sampled_style_emb, sampled_content_emb), axis=1)
+        # Update the average style embeddings for different styles
+        # This will be used in transfering the style of a sentence
+        # during inference
+        self.update_average_style_emb(sampled_style_emb, style_labels)
 
         #=========== Losses on content space =============#
         # Discriminator Loss
@@ -205,14 +212,28 @@ class AdversarialVAE(nn.Module):
         epsilon = torch.randn(mu.size(1))
         return mu + epsilon*torch.exp(log_var)
 
-    def get_average_style_emb(self, style_emb, style_labels):
+    def update_average_style_emb(self, style_emb, style_labels):
         """
         Args:
             style_emb: batch of sampled style embeddings of the input sentences,shape = (batch_size,mconfig.style_hidden_dim)
-            style_labels: style labels of the corresponding input sentences,shape = (batch_size,1)
+            style_labels: style labels of the corresponding input sentences,shape = (batch_size,2)
         """
+        neg_style_label = torch.LongTensor([0, 1], device=style_emb.device)
         # Iterate over the style labels
-        for label in style_labels:
+        for idx, label in enumerate(style_labels):
+            # Calculate average for negative style
+            if neg_style_label.equal(label):
+                # Increment the counter for negative styles
+                self.num_neg_styles = self.num_neg_styles + 1
+                # Calculate a running average of the negative style embedding
+                self.avg_label_emb[0] = (
+                    (self.num_neg_styles-1) * self.avg_label_emb[0] + style_emb[idx])/self.num_neg_styles
+            else:
+                # Increment the counter for positive styles
+                self.num_pos_styles = self.num_pos_styles + 1
+                # Calculate a running average of the positive style embedding
+                self.avg_label_emb[1] = (
+                    (self.num_pos_styles-1) * self.avg_label_emb[1] + style_emb[idx])/self.num_pos_styles
 
     def get_content_disc_preds(self, style_emb):
         """
@@ -347,13 +368,13 @@ class AdversarialVAE(nn.Module):
                                              log_var.exp()-mu.pow(2), dim=1)))
         return kl_loss
 
-    def generate_sentences(self, input_sentences=None, latent_emb):
+    def generate_sentences(self, input_sentences, latent_emb):
         """
         Args:
-           input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
-                            It is of type 'None' when the function is called in inference mode
-           latent_emb: generative embedding formed by the concatenation of sampled style and
+            latent_emb: generative embedding formed by the concatenation of sampled style and
                        content latent embeddings, shape = (batch_size,mconfig.generative_emb_dim)
+            input_sentences: batch of token indices of input sentences, shape = (batch_size,max_seq_length)
+                            It is of type 'None' when the function is called in inference mode
         Returns:
             output_sentences: batch of token indices or logits of generated sentences based on the
             mode of operation.
@@ -365,7 +386,7 @@ class AdversarialVAE(nn.Module):
         if not self.inference:
             # Prepend the input sentences with <sos> token
             sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
+                [gconfig.predefined_word_index['<sos>']], device=input_sentences.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             input_sentences = torch.cat(
                 (sos_token_tensor, input_sentences), dim=1)
             sentence_embs = self.dropout(self.embedding(input_sentences))
@@ -378,10 +399,10 @@ class AdversarialVAE(nn.Module):
             # Delete latent embedding and sos token tensor to reduce memory usage
             del latent_emb, sos_token_tensor
             output_sentences = torch.zeros(
-                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size, device=latent_emb.device)
+                mconfig.max_seq_len, mconfig.batch_size, mconfig.vocab_size, device=input_sentences.device)
             # initialize hidden state
             hidden_states = torch.zeros(
-                mconfig.batch_size, mconfig.hidden_dim, device=latent_emb.device)
+                mconfig.batch_size, mconfig.hidden_dim, device=input_sentences.device)
             # generate sentences one word at a time in a loop
             for idx in range(mconfig.max_seq_len):
                 # get words at the index idx from all the batches
