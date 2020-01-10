@@ -58,7 +58,7 @@ class AdversarialVAE(nn.Module):
         # Each element of the dict consists of average of latent style embeddings
         # of all the sentences of that particular label/style.
         # 0 -> negative, 1 -> positive
-        self.avg_label_emb = {
+        self.avg_style_emb = {
             0: torch.zeros(mconfig.style_hidden_dim),
             1: torch.zeros(mconfig.style_hidden_dim)
         }
@@ -226,14 +226,14 @@ class AdversarialVAE(nn.Module):
                 # Increment the counter for negative styles
                 self.num_neg_styles = self.num_neg_styles + 1
                 # Calculate a running average of the negative style embedding
-                self.avg_label_emb[0] = (
-                    (self.num_neg_styles-1) * self.avg_label_emb[0] + style_emb[idx])/self.num_neg_styles
+                self.avg_style_emb[0] = (
+                    (self.num_neg_styles-1) * self.avg_style_emb[0] + style_emb[idx])/self.num_neg_styles
             else:
                 # Increment the counter for positive styles
                 self.num_pos_styles = self.num_pos_styles + 1
                 # Calculate a running average of the positive style embedding
-                self.avg_label_emb[1] = (
-                    (self.num_pos_styles-1) * self.avg_label_emb[1] + style_emb[idx])/self.num_pos_styles
+                self.avg_style_emb[1] = (
+                    (self.num_pos_styles-1) * self.avg_style_emb[1] + style_emb[idx])/self.num_pos_styles
 
     def get_content_disc_preds(self, style_emb):
         """
@@ -481,7 +481,7 @@ class AdversarialVAE(nn.Module):
         sampled_content_emb = self.sample_prior(
             content_emb_mu, content_emb_log_var)
         # Get the approximate estimate of the target style embedding
-        target_style_emb = self.avg_label_emb[style]
+        target_style_emb = self.avg_style_emb[style]
         # Generative embedding
         generative_emb = torch.cat(
             (target_style_emb.unsqueeze(0).repeat(batch_size, 1), sampled_content_emb), axis=1)
