@@ -1,5 +1,5 @@
 # Linguistic Style Transfer 
-Implementation of the paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer`[link)](https://www.aclweb.org/anthology/P19-1041.pdf) in Pytorch
+Implementation of the paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer`[(link)](https://www.aclweb.org/anthology/P19-1041.pdf) in Pytorch
 
 ## Abstract
   This paper tackles the problem of disentangling the latent representations of style and content in language models.
