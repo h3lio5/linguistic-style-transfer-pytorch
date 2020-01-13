@@ -66,7 +66,7 @@ class AdversarialVAE(nn.Module):
         # dropout
         self.dropout = nn.Dropout(mconfig.dropout)
 
-    def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration):
+    def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration, last_epoch=False):
         """
         Args:
             sequences : token indices of input sentences of shape = (batch_size,max_seq_length)
@@ -74,6 +74,7 @@ class AdversarialVAE(nn.Module):
             style_labels: labels of sentiment of the input sentences, shape = (batch_size,2)
             content_bow: Bag of Words representations of the input sentences, shape = (batch_size,bow_hidden_size)
             iteration: number of iterations completed till now; used for KL annealing
+            last_epoch: save average style embeddings if last_epoch is true
 
         Returns:
             content_disc_loss: loss incurred by content discriminator/adversary
@@ -108,7 +109,8 @@ class AdversarialVAE(nn.Module):
         # Update the average style embeddings for different styles
         # This will be used in transfering the style of a sentence
         # during inference
-        self.update_average_style_emb(sampled_style_emb, style_labels)
+        if last_epoch:
+            self.update_average_style_emb(sampled_style_emb, style_labels)
 
         #=========== Losses on content space =============#
         # Discriminator Loss
