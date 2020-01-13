@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 labels = labels.cuda()
                 bow_rep = bow_rep.cuda()
             content_disc_loss, style_disc_loss, vae_and_cls_loss = model(
-                sequences, seq_lens.squeeze(1), labels, bow_rep, iteration+1)
+                sequences, seq_lens.squeeze(1), labels, bow_rep, iteration+1, epoch == mconfig.epochs-1)
 
             #============== Update Adversary/Discriminator parameters ===========#
             # update content discriminator parametes
