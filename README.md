@@ -23,9 +23,9 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
     * Adversarial procedure is similar to that of the original GAN, where discriminator is trained to correctly classify 
       the samples and the generator is trained to fool the discriminator by producing samples indistinguishable from 
       the original data samples.
-    * In this setting, for style space, teh style discriminator is trained to predict the style label and the style generator
+    * In this setting, for style space, the style discriminator is trained to predict the style label and the style generator
       is trained to increase the entropy of the predictions/softmax output since higher entropy corresponds to lesser
-      information.
+      information. Similarly, the same procedure is repeated for content space.
    * To address the posterior collapse issue that usually occurs when powerful decoders like LSTMs are used, sigmoid KL 
      annealing is used during training. Also, the latent embedding is concatenated to word embeddings at every time step of
      the decoder.
