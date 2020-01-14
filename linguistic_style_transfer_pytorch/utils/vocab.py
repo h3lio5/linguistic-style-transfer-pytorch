@@ -33,7 +33,6 @@ class Vocab:
         index2word = dict()
         words = collections.Counter()
         word2index = self.predefined_word_index
-        i = 3
 
         with open(self.train_file_path, 'r') as file:
             lines = file.readlines()
@@ -68,17 +67,17 @@ class Vocab:
                 index2word[idx] = token[0]
                 emb_matrix[idx, :] = w2v_model[token[0]]
                 idx = idx + 1
-        logging.info("Created embeddings")
-        logging.info("Created word2index dictionary")
-        logging.info("Created index2word dictionary")
+        print("Created embeddings")
+        print("Created word2index dictionary")
+        print("Created index2word dictionary")
         # Saving the vocab file
         with open(self.vocab_save_path + 'word2index.json', 'w') as json_file:
             json.dump(word2index, json_file)
-        logging.info("Saved word2index.json at {}".format(
+        print("Saved word2index.json at {}".format(
             self.vocab_save_path+'word2index.json'))
         with open(self.vocab_save_path + 'index2word.json', 'w') as json_file:
             json.dump(index2word, json_file)
-        logging.info("Saved index2word.json at {}".format(
+        print("Saved index2word.json at {}".format(
             self.vocab_save_path+'index2word.json'))
         # Save word embedding file
         np.save(self.config.word_embedding_path, emb_matrix)
@@ -107,12 +106,12 @@ class Vocab:
             i += 1
 
         self.config.bow_size = len(allowed_vocab)
-        logging.info("Created word index blacklist for BoW")
-        logging.info("BoW size: {}".format(self.config.bow_size))
+        print("Created word index blacklist for BoW")
+        print("BoW size: {}".format(self.config.bow_size))
         # saving bow vocab
         with open(self.vocab_save_path + 'bow.json', 'w') as json_file:
             json.dump(bow_filtered_vocab_indices, json_file)
-        logging.info("Saved bow.json at {}".format(
+        print("Saved bow.json at {}".format(
             self.vocab_save_path+'bow.json'))
 
     def _get_sentiment_words(self):
