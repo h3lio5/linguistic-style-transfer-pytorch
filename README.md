@@ -30,3 +30,4 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
      annealing is used during training. Also, the latent embedding is concatenated to word embeddings at every time step of
      the decoder.
      
+ ## Training and Inference
