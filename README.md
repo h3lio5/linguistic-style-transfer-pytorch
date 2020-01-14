@@ -29,7 +29,18 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
    * To address the posterior collapse issue that usually occurs when powerful decoders like LSTMs are used, sigmoid KL 
      annealing is used during training. Also, the latent embedding is concatenated to word embeddings at every time step of
      the decoder.
+   * During the last epoch of training, average of style embeddings over whole train data is calculated for both the styles(positive and negative sentiment). These average positive and negative style embeddings are approximated to be 
+     estimates of positive and negative style embeddings.
+   * During inference phase, deteremine the content embedding of the sentence and concatenate the estimated style embedding
+     of the opposite sentiment to it. Use this latent embedding for decoding/transfering style.
      
  ## Training and Inference
-  Illustration of training and inference
-  ![training_and_inference](images/training_inference.png)
+  Illustration of training and inference.    
+  ![training_and_inference](images/resized_training_inference.png)
+  
+  ## Documents
+  ### Dependencies
+  To download all the dependencies, run the following command -    
+  ` pip3 install -r requirements.txt`
+  ### Directory Description
+  
