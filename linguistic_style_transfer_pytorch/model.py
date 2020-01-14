@@ -66,7 +66,7 @@ class AdversarialVAE(nn.Module):
         # dropout
         self.dropout = nn.Dropout(mconfig.dropout)
 
-    def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration, last_epoch=False):
+    def forward(self, sequences, seq_lengths, style_labels, content_bow, iteration, last_epoch):
         """
         Args:
             sequences : token indices of input sentences of shape = (batch_size,max_seq_length)
