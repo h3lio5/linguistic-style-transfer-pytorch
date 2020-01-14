@@ -20,11 +20,13 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
    ### <ins>Multitask Loss</ins>:
    * It operates on the latent space to ensure that the space does contain the information we wish to encode,i.e. 
       it encourages the style space and content space to preserve the style and content information respectively.
-   * <strong><ins>Style Loss</ins></strong>:
-      * A softmax classifier on the style space <strong>s</strong> is trained to predict the style label, given by      
-      <i><strong>y</strong></i><sub>s</sub> = softmax(W<sub>mul(s)</sub><strong>s</strong> + b<sub>mul(s)</sub>)       
-      * θ<sub>mul(s)</sub> = [W<sub>mul(s)</sub>;b<sub>mul(s)</sub>] are parameters of the style classifier in the 
-        multitask setting, and <em>y<sub>s</sub></em> is the output of softmax layer.
-      * The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by              
+   * <strong><ins>Style Loss</ins></strong>:        
+       A softmax classifier on the style space <strong>s</strong> is trained to predict the style label, given by      
+      <i><strong>y</strong></i><sub>s</sub> = softmax(W<sub>mul(s)</sub><strong>s</strong> + b<sub>mul(s)</sub>)          
+       where, θ<sub>mul(s)</sub> = [W<sub>mul(s)</sub>;b<sub>mul(s)</sub>] are parameters of the style classifier in the 
+        multitask setting, and <em>y<sub>s</sub></em> is the output of softmax layer.            
+       The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by              
         <em>J</em><sub>mul(s)</sub>(<em>θ</em><sub>E</sub>;<em>θ</em><sub>mul(s)</sub>)=-Σ<sub> <em>l</em>∊labels</sub>t<sub>s</sub>(<em>l</em>)log<em>y</em><sub>s</sub>(<em>l</em>)
+   * <strong><ins> Content Loss</ins></strong>:
+     * 
     
