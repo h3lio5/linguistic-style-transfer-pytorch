@@ -25,5 +25,5 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
       <i><strong>y</strong></i><sub>s</sub> = softmax(W<sub>mul(s)</sub><strong>s</strong> + b<sub>mul(s)</sub>)       
       * θ<sub>mul(s)</sub> = [W<sub>mul(s)</sub>;b<sub>mul(s)</sub>] are parameters of the style classifier in the 
         multitask setting, and <em>y<sub>s</sub></em> is the output of softmax layer.
-      * The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by
-        J<sub>mul(s)</sub>(θ<sub>E</sub>;θ<sub>mul(s)</sub>)=-𝝨<sub>l∊labels</sub>t<sub>s</sub>(l)logy<sub>s</sub>(l)
+      * The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by     
+        J<sub>mul(s)</sub>(θ<sub>E</sub>;θ<sub>mul(s)</sub>)= <img src="https://latex.codecogs.com/gif.latex?-\sum_{l\epsilon&space;labels}&space;t_{s}(l)logy&space;_{s}(l)" title="-\sum_{l\epsilon labels} t_{s}(l)logy _{s}(l)" />
