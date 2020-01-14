@@ -43,4 +43,41 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   To download all the dependencies, run the following command -    
   ` pip3 install -r requirements.txt`
   ### Directory Description
-  
+  Run the following command from the root directory to download, preprocess data, create vocab and word embeddings.    
+  ` python3 setup_data.py `
+  The repository should like this after running the above command -    
+  <pre><code>
+root
+├──  images
+├──  linguistic_style_transfer_pytorch
+│    ├── data
+│    │   ├── raw
+│    │   │   ├── sentiment.train.0
+│    │   │   └── sentiment.train.1
+│    │   ├── clean
+│    │   │    ├── yelp_train_data.txt
+│    │   │    └── yelp_train_labels.txt
+│    │   ├── lexicon
+│    │   │   ├── positive-words.txt
+│    │   │   └── negative-words.txt
+│    │   ├── bow.json
+│    │   ├── embedding.txt
+│    │   ├── index2word.json
+│    │   ├── word2index.json
+│    │   └── word_embeddings.npy
+│    ├── utils 
+│    │    ├── __init__.py
+│    │    ├── preprocess.py
+│    │    ├── train_w2v.py
+│    │    └── vocab.py
+│    ├── __init__.py
+│    ├── model.py
+│    ├── data_loader.py
+│    ├── config.py
+│    └── checkpoints/
+├──  README.md
+├──  setup.py
+├──  setup_data.py
+├──  train.py
+└──  generate.py
+</code></pre>
