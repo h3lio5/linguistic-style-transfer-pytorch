@@ -8,8 +8,10 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   style and content are indeed disentangled in the latent space. This disentangled latent representation learning can be                  applied to style transfer on non-parallel corpora. We achieve high performance in terms of transfer accuracy, content     preservation, and language fluency, in comparision to various previous approaches.
 
 ## Overview
-* Map the sentences to a latent space using VAE framework.
-* The latent space is artificially divided into style space and content space, and the model is encouraged to disentangle
-  the latent space with respect to the above two features,namely, style and content.
-* To accomplish this, the VAE loss (ELBO) is augmented with two auxiliary losses,namely, multitask loss and adversary loss.
-* 
+* ### Introduction
+  * Map the sentences to a latent space using VAE framework.
+  * The latent space is artificially divided into style space and content space, and the model is encouraged to disentangle
+    the latent space with respect to the above two features,namely, style and content.
+  * To accomplish this, the VAE loss (ELBO) is augmented with two auxiliary losses,namely, multitask loss and adversary loss.
+* ### Model
+  * <strong><ins>Multitask Loss</ins>:</strong>
