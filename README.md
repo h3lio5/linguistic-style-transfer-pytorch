@@ -37,3 +37,10 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
  ## Training and Inference
   Illustration of training and inference.    
   ![training_and_inference](images/resized_training_inference.png)
+  
+  ## Documents
+  ### Dependencies
+  To download all the dependencies, run the following command -    
+  ` pip3 install -r requirements.txt`
+  ### Directory Description
+  
