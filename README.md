@@ -15,8 +15,8 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   * To accomplish this, the VAE loss (ELBO) is augmented with two auxiliary losses,namely, multitask loss and adversary loss.
 ## Model
    ### <ins>VAE Loss</ins>:
-     * J<sub>AE</sub>(θ<sub>E</sub>, θ<sub>D</sub>) = − E<sub>q<sub>E</sub>(z|x)</sub>[log p(x|z)] + λ<sub>kl</sub>           KL(q(z|x)||p(z)),   
-     where λkl is the hyperparameter balancing the reconstruction loss and the KL term.
+   * J<sub>AE</sub>(θ<sub>E</sub>, θ<sub>D</sub>) = − E<sub>q<sub>E</sub>(z|x)</sub>[log p(x|z)] + λ<sub>kl</sub>                   KL(q(z|x)||p(z)),   
+     where λ<sub>kl</sub> is the hyperparameter balancing the reconstruction loss and the KL term.
    ### <ins>Multitask Loss</ins>:
    * It operates on the latent space to ensure that the space does contain the information we wish to encode,i.e. 
       it encourages the style space and content space to preserve the style and content information respectively.
@@ -25,6 +25,6 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
       <i><strong>y</strong></i><sub>s</sub> = softmax(W<sub>mul(s)</sub><strong>s</strong> + b<sub>mul(s)</sub>)       
       * θ<sub>mul(s)</sub> = [W<sub>mul(s)</sub>;b<sub>mul(s)</sub>] are parameters of the style classifier in the 
         multitask setting, and <em>y<sub>s</sub></em> is the output of softmax layer.
-      * The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by
-        J<sub>mul(s)</sub>(θ<sub>E</sub>;θ<sub>mul(s)</sub>)=-Σ<sub>l∊labels</sub>t<sub>s</sub>(l)log<em>y</em><sub>s</sub>(l)
+      * The classifier is trained with cross-entropy loss against ground truth distribution t<sub>s</sub>(.) by              
+        <em>J</em><sub>mul(s)</sub>(<em>θ</em><sub>E</sub>;<em>θ</em><sub>mul(s)</sub>)=-Σ<sub> <em>l</em>∊labels</sub>t<sub>s</sub>(<em>l</em>)log<em>y</em><sub>s</sub>(<em>l</em>)
     
