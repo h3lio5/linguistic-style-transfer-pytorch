@@ -8,19 +8,19 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   style and content are indeed disentangled in the latent space. This disentangled latent representation learning can be                  applied to style transfer on non-parallel corpora. We achieve high performance in terms of transfer accuracy, content     preservation, and language fluency, in comparision to various previous approaches.
 
 ## Overview
-## <ins>Introduction</ins>
+## Introduction
   * Map the sentences to a latent space using VAE framework.
   * The latent space is artificially divided into style space and content space, and the model is encouraged to disentangle
     the latent space with respect to the above two features,namely, style and content.
   * To accomplish this, the VAE loss (ELBO) is augmented with two auxiliary losses,namely, multitask loss and adversary loss.
-## <ins>Model</ins>
-  * ### <ins>VAE Loss</ins>:
-    * J<sub>AE</sub>(θ<sub>E</sub>, θ<sub>D</sub>) = − E<sub>q<sub>E</sub>(z|x)</sub>[log p(x|z)] + λ<sub>kl</sub>        KL(q(z|x)||p(z)),   
+## Model
+   ### <ins>VAE Loss</ins>:
+     * J<sub>AE</sub>(θ<sub>E</sub>, θ<sub>D</sub>) = − E<sub>q<sub>E</sub>(z|x)</sub>[log p(x|z)] + λ<sub>kl</sub>           KL(q(z|x)||p(z)),   
      where λkl is the hyperparameter balancing the reconstruction loss and the KL term.
-  * <strong><ins>Multitask Loss</ins>:</strong>
-    * It operates on the latent space to ensure that the space does contain the information we wish to encode,i.e. 
+   ### <ins>Multitask Loss</ins>:
+   * It operates on the latent space to ensure that the space does contain the information we wish to encode,i.e. 
       it encourages the style space and content space to preserve the style and content information respectively.
-    * <strong><ins>Style Loss</ins></strong>:
+   * <strong><ins>Style Loss</ins></strong>:
       * A softmax classifier on the style space <strong>s</strong> is trained to predict the style label, given by      
       <i><strong>y</strong></i><sub>s</sub> = softmax(W<sub>mul(s)</sub><strong>s</strong> + b<sub>mul(s)</sub>)       
       * θ<sub>mul(s)</sub> = [W<sub>mul(s)</sub>;b<sub>mul(s)</sub>] are parameters of the style classifier in the 
