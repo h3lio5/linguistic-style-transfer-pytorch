@@ -12,6 +12,8 @@ class GeneralConfig:
         # original vocab size
         self.vocab_size = 9200
         self.bow_hidden_dim = 7526
+        self.data_path = os.path.join(
+            ROOT, "linguistic_style_transfer_pytorch", "data")
         self.vocab_save_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.train_pos_reviews_file_path = os.path.join(
