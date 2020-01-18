@@ -43,9 +43,9 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   To download all the dependencies, run the following command -    
   ` pip3 install -r requirements.txt`
   ### Directory Description
-  Run the following command from the root directory to download, preprocess data, create vocab and word embeddings.    
-  ` python3 setup_data.py `
-  The repository should like this after running the above command -    
+  Run the following command from the root directory to download, preprocess data, create vocab and word embeddings.          
+  ` python3 setup_data.py `           
+  The repository should like this after running the above command -         
   <pre><code>
 root
 ├──  images
@@ -81,7 +81,8 @@ root
 ├──  train.py
 └──  generate.py
 </code></pre>
-
+To train the model, run the following command in the root folder-         
+`python3 train.py`       
 ### Resources
 * Original paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer` [(link)](https://www.aclweb.org/anthology/P19-1041.pdf)
 * tensorflow implementation by the author [link](https://github.com/vineetjohn/linguistic-style-transfer)
