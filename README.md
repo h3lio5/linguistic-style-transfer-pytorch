@@ -50,10 +50,11 @@ To generate style transfered sentence,
 `python3 generate.py`      
 The user will be prompted to enter the source sentence and the target style on running the above command:       
 Example:           
-<pre><code> Enter the source sentence: the book is good
-            Enter the target style: pos or neg: neg
-            Style transfered sentence: the book is boring
-</code>></pre>
+<pre><code>
+Enter the source sentence: the book is good
+Enter the target style: pos or neg: neg
+Style transfered sentence: the book is boring
+</code></pre>
 ### Resources
 * Original paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer` [(link)](https://www.aclweb.org/anthology/P19-1041.pdf)
 * tensorflow implementation by the author [link](https://github.com/vineetjohn/linguistic-style-transfer)
