@@ -13,7 +13,7 @@ from gensim.models import KeyedVectors
 
 class Vocab:
     """
-    Class that holds all the necessary methods to create vocabulary
+    Holds all the necessary methods to create vocabulary
     """
 
     def __init__(self, config):
