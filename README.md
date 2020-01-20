@@ -43,17 +43,17 @@ root
 ├──  train.py
 └──  generate.py
 </code></pre>
-<strong> Note:</strong> Run all the commands from the root directory.
-To train the model,           
-`python3 train.py`   
-To generate style transfered sentence,
-`python3 generate.py`
-The user will be prompted to enter the source sentence and the target style on running the above command:  
-Example:    
+<strong> Note:</strong> Run all the commands from the root directory.      
+To train the model,                
+`python3 train.py`        
+To generate style transfered sentence,       
+`python3 generate.py`      
+The user will be prompted to enter the source sentence and the target style on running the above command:       
+Example:           
 <pre><code> Enter the source sentence: the book is good
             Enter the target style: pos or neg: neg
             Style transfered sentence: the book is boring
-
+</code>></pre>
 ### Resources
 * Original paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer` [(link)](https://www.aclweb.org/anthology/P19-1041.pdf)
 * tensorflow implementation by the author [link](https://github.com/vineetjohn/linguistic-style-transfer)
