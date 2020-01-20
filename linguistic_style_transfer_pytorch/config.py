@@ -17,9 +17,9 @@ class GeneralConfig:
         self.vocab_save_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.train_pos_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "yelp_train_pos.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.1.txt")
         self.train_neg_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "yelp_train_neg.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.0.txt")
         self.train_text_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_data.txt")
         self.train_labels_file_path = os.path.join(
