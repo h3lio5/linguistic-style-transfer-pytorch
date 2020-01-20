@@ -8,14 +8,22 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
   style and content are indeed disentangled in the latent space. This disentangled latent representation learning can be                  applied to style transfer on non-parallel corpora. We achieve high performance in terms of transfer accuracy, content     preservation, and language fluency, in comparision to various previous approaches.
 
 To get a basic overview of the paper, read the [summary](summary.md).
- ## Training and Inference
-  Illustration of training and inference.    
-  ![training_and_inference](images/resized_training_inference.png)
-  
-  ## Documents
-  ### Dependencies
-  To download all the dependencies, run the following command -    
-  ` pip3 install -r requirements.txt`
+
+## Setup Instructions and Dependencies
+You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
+
+``` Batchfile
+git clone https://github.com/h3lio5/linguistic-style-transfer-pytorch.git
+```
+All dependencies required by this repo can be downloaded by creating a virtual environment with Python 3.7 and running
+
+``` Batchfile
+python3 -m venv .env
+source .env/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+ 
   ### Directory Description
    Overview of the repository.       
   <pre><code>
@@ -52,8 +60,13 @@ python train.py
 + The parameters for your experiment are all set by defualt. But you are free to set them on your own by editing the `config.py` file.
 + The training script will create a folder **checkpoints** as specified in your `config.py` file.
 + This folder will contain all model parameters saved after each epoch.
-To generate style transfered sentence,       
-`python3 generate.py`      
+
+## 3. Transfering Text Style from Trained Models
+To transfer text style of a sentence from trained models, run
+
+```Batchfile
+python generate.py 
+```
 The user will be prompted to enter the source sentence and the target style on running the above command:       
 Example:           
 ``` Batchfile
@@ -61,6 +74,29 @@ Enter the source sentence: the book is good
 Enter the target style: pos or neg: neg
 Style transfered sentence: the book is boring
 ```
+## 4.Repository Overview
+This repository contains the following files and folders
+
+1. **images**: Contains media for `readme.md`.
+
+2. `linguistic-style-transfer-pytorch/data_loader.py`: Contains helper functions that load data.
+
+3. `generate.py`: Used to generate and save images from trained models.
+
+4. `linguistic-style-transfer-pytorch/model.py`: Contains code to build the model.
+
+5. `requirements.txt`: Lists dependencies for easy setup in virtual environments.
+
+6. `train.py`: Contains code to train models from scratch.
+
+7. `linguistic-style-transfer-pytorch/config.py`: Contains information about various file paths and model configuration.
+
+8. `linguistic-style-transfer-pytorch/vocab.py`: Contains code to build the vocabulary and word embeddings.
+
+9. `linguistic-style-transfer-pytorch/`
+## 5.Training and Inference
+Illustration of training and inference.    
+![training_and_inference](images/resized_training_inference.png)
 ### Resources
 * Original paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer` [(link)](https://www.aclweb.org/anthology/P19-1041.pdf)
 * tensorflow implementation by the author [link](https://github.com/vineetjohn/linguistic-style-transfer)
