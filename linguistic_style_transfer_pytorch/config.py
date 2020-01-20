@@ -40,6 +40,8 @@ class GeneralConfig:
             ROOT, "linguistic_style_transfer_pytorch", "data", "bow.json")
         self.model_save_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "checkpoints")
+        self.avg_style_emb_path = os.path.join(
+            ROOT, "linguistic_style_transfer_pytorch", "checkpoints", "avg_style_emb.pkl")
         self.embedding_size = 300
         self.pad_token = 0
         self.sos_token = 1
