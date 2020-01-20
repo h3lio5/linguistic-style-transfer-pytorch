@@ -17,6 +17,6 @@ def train_word2vec_model(text_file_path, model_file_path):
 
 
 if __name__ == "__main__":
-    config = GeneralConfig()
-    train_word2vec_model(config.train_text_file_path,
-                         config.word_embedding_text_file_path)
+    gconfig = GeneralConfig()
+    train_word2vec_model(gconfig.train_text_file_path,
+                         gconfig.word_embedding_text_file_path)
