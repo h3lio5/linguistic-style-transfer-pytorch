@@ -23,34 +23,6 @@ source .env/bin/activate
 pip install -r requirements.txt
 pip install -e .
 ```
- 
-  ### Directory Description
-   Overview of the repository.       
-  <pre><code>
-root
-├──  images
-├──  linguistic_style_transfer_pytorch
-│    ├── data
-│    │   ├── raw/*
-│    │   ├── clean/*  
-│    │   ├── lexicon/*
-│    │   └──  embedding.txt     
-│    ├── utils 
-│    │    ├── __init__.py
-│    │    ├── preprocess.py
-│    │    ├── train_w2v.py
-│    │    └── vocab.py
-│    ├── __init__.py
-│    ├── model.py
-│    ├── data_loader.py
-│    ├── config.py
-│    └── checkpoints/
-├──  README.md
-├──  setup.py
-├──  setup_data.py
-├──  train.py
-└──  generate.py
-</code></pre>
 <strong> Note:</strong> Run all the commands from the root directory.      
 ## Training Model from Scratch
 To train your own model from scratch, run
@@ -81,22 +53,26 @@ This repository contains the following files and folders
 
 2. `linguistic-style-transfer-pytorch/data_loader.py`: Contains helper functions that load data.
 
-3. `generate.py`: Used to generate and save images from trained models.
+3. `linguistic-style-transfer-pytorch/model.py`: Contains code to build the model.
 
-4. `linguistic-style-transfer-pytorch/model.py`: Contains code to build the model.
+4. `linguistic-style-transfer-pytorch/config.py`: Contains information about various file paths and model configuration.
 
-5. `requirements.txt`: Lists dependencies for easy setup in virtual environments.
+5. `linguistic-style-transfer-pytorch/utils/vocab.py`: Contains code to build the vocabulary and word embeddings.
 
-6. `train.py`: Contains code to train models from scratch.
+6. `linguistic-style-transfer-pytorch/utils/preprocess.py` Contains code to preprocess the data.
 
-7. `linguistic-style-transfer-pytorch/config.py`: Contains information about various file paths and model configuration.
+7. `linguistic-style-transfer-pytorch/utils/train_w2v.py`: Contains code to train word2vec embeddings from scratch on the downloaded data. 
 
-8. `linguistic-style-transfer-pytorch/vocab.py`: Contains code to build the vocabulary and word embeddings.
+8. `generate.py`: Used to generate and save images from trained models.
 
-9. `linguistic-style-transfer-pytorch/`
+9. `train.py`: Contains code to train models from scratch.
+
+10. `requirements.txt`: Lists dependencies for easy setup in virtual environments.
+
+
 ## 5.Training and Inference
 Illustration of training and inference.    
 ![training_and_inference](images/resized_training_inference.png)
-### Resources
+## Resources
 * Original paper `Disentangled Representation Learning for Non-Parallel Text Style Transfer` [(link)](https://www.aclweb.org/anthology/P19-1041.pdf)
 * tensorflow implementation by the author [link](https://github.com/vineetjohn/linguistic-style-transfer)
