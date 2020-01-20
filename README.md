@@ -42,9 +42,9 @@ python generate.py
 The user will be prompted to enter the source sentence and the target style on running the above command:       
 Example:           
 ``` Batchfile
-Enter the source sentence: the book is good
-Enter the target style: pos or neg: neg
-Style transfered sentence: the book is boring
+Please enter the source sentence: the book is good
+Please enter the target style: pos or neg: neg
+Your style transfered sentence is: the book is boring
 ```
 ## 4.Repository Overview
 This repository contains the following files and folders
