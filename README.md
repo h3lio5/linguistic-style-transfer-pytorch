@@ -9,7 +9,7 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
 
 To get a basic overview of the paper, read the [summary](summary.md).
 
-## Setup Instructions and Dependencies
+## 1.Setup Instructions and Dependencies
 You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
 
 ``` Batchfile
@@ -24,7 +24,7 @@ pip install -r requirements.txt
 pip install -e .
 ```
 <strong> Note:</strong> Run all the commands from the root directory.      
-## Training Model from Scratch
+## 2.Training Model from Scratch
 To train your own model from scratch, run
 ```Batchfile
 python train.py 
