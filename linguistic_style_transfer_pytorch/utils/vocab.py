@@ -71,14 +71,14 @@ class Vocab:
         print("Created word2index dictionary")
         print("Created index2word dictionary")
         # Saving the vocab file
-        with open(self.vocab_save_path + 'word2index.json', 'w') as json_file:
+        with open(self.vocab_save_path + '/word2index.json', 'w') as json_file:
             json.dump(word2index, json_file)
         print("Saved word2index.json at {}".format(
-            self.vocab_save_path+'word2index.json'))
-        with open(self.vocab_save_path + 'index2word.json', 'w') as json_file:
+            self.vocab_save_path+'/word2index.json'))
+        with open(self.vocab_save_path + '/index2word.json', 'w') as json_file:
             json.dump(index2word, json_file)
         print("Saved index2word.json at {}".format(
-            self.vocab_save_path+'index2word.json'))
+            self.vocab_save_path+'/index2word.json'))
         # Save word embedding file
         np.save(self.config.word_embedding_path, emb_matrix)
         # create bow vocab
@@ -109,10 +109,10 @@ class Vocab:
         print("Created word index blacklist for BoW")
         print("BoW size: {}".format(self.config.bow_size))
         # saving bow vocab
-        with open(self.vocab_save_path + 'bow.json', 'w') as json_file:
+        with open(self.vocab_save_path + '/bow.json', 'w') as json_file:
             json.dump(bow_filtered_vocab_indices, json_file)
         print("Saved bow.json at {}".format(
-            self.vocab_save_path+'bow.json'))
+            self.vocab_save_path+'/bow.json'))
 
     def _get_sentiment_words(self):
         """
