@@ -158,7 +158,7 @@ class AdversarialVAE(nn.Module):
             mconfig.style_adversary_loss_weight * style_entropy_loss + \
             mconfig.style_multitask_loss_weight * style_mul_loss + \
             mconfig.content_multitask_loss_weight * content_mul_loss + \
-            reconstruction_loss
+            reconstruction_loss + style_kl_loss + content_kl_loss
 
         return content_disc_loss, style_disc_loss, vae_and_classifier_loss
 
