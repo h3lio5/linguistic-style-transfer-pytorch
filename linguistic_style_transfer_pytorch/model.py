@@ -246,7 +246,7 @@ class AdversarialVAE(nn.Module):
         Returns samples drawn from the latent space constrained to
         follow diagonal Gaussian
         """
-        epsilon = torch.randn(mu.size(1))
+        epsilon = torch.randn(mu.size(1),device=mu.device)
         return mu + epsilon*torch.exp(log_var)
 
     def update_average_style_emb(self, style_emb, style_labels):
