@@ -5,4 +5,4 @@ sklearn==0.0
 spacy==2.2.3
 nltk==3.4.5
 gensim==3.8.1
-tqdm==4.36.1
+tqdm==4.66.3
