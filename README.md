@@ -9,6 +9,8 @@ Implementation of the paper `Disentangled Representation Learning for Non-Parall
 
 To get a basic overview of the paper, read the [summary](summary.md).
 
+NOTE: Please note that there are many unresolved bugs in the implementation and don't expect to get the correct results. Please use it only as a reference implementation.
+
 ## 1.Setup Instructions and Dependencies
 You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
 
